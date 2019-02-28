@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"allowJs": true,
+		"target": "es2015",
+		"lib": ["es6", "dom"]
+	},
+	"include": ["src/scripts/**/*"],
+	"exclude": ["node_modules"]
+}

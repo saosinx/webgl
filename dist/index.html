@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<title>Webgl application</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta http-equiv="x-dns-prefetch-control" content="on">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, shrink-to-fit=no, minimal-ui">
+		<meta name="HandheldFriendly" content="True">
+		<meta name="MobileOptimized" content="320">
+		<meta name="robots" content="noodp">
+		<meta name="generator" content="digital-agency Web-Modern">
+		<meta name="imagetoolbar" content="no">
+		<meta name="msthemecompatible" content="no">
+		<meta name="cleartype" content="on">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="format-detection" content="address=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<link rel="dns-prefetch" href="//fonts.googleapis.com">
+		<link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
+		<link rel="dns-prefetch" href="//www.googletagmanager.com">
+		<link rel="dns-prefetch" href="//mc.yandex.ru">
+		<link rel="stylesheet" href="assets/styles/index.css">
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<div class="counters">
+			<div class="time" id="time-counter"></div>
+			<div class="frames" id="frame-counter"></div>
+			<div class="fps" id="fps-counter"></div>
+		</div>
+		<div class="control-panel" id="control-panel">
+						<div class="range-control">
+							<label for="rotateX">angleX</label>
+							<input type="range" autocomplete="off" id="rotateX" min="-360" max="360" value="30" step="1"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="rotateY">angleY</label>
+							<input type="range" autocomplete="off" id="rotateY" min="-360" max="360" value="-30" step="1"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="rotateZ">angleZ</label>
+							<input type="range" autocomplete="off" id="rotateZ" min="-360" max="360" value="0" step="1"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="translateX">x</label>
+							<input type="range" autocomplete="off" id="translateX" min="-1" max="1" value="0" step="0.01"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="translateY">y</label>
+							<input type="range" autocomplete="off" id="translateY" min="-1" max="1" value="0" step="0.01"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="translateZ">z</label>
+							<input type="range" autocomplete="off" id="translateZ" min="-10" max="5" value="-3" step="0.01"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="scale">scale</label>
+							<input type="range" autocomplete="off" id="scale" min="0" max="5" value="1" step="0.01"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="eyeX">eyeX</label>
+							<input type="range" autocomplete="off" id="eyeX" min="-1.5" max="1.5" value="0" step="0.01"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="eyeY">eyeY</label>
+							<input type="range" autocomplete="off" id="eyeY" min="-1.5" max="1.5" value="0" step="0.01"><span class="control-value"></span>
+						</div>
+						<div class="range-control">
+							<label for="eyeZ">eyeZ</label>
+							<input type="range" autocomplete="off" id="eyeZ" min="0" max="5" value="1" step="0.01"><span class="control-value"></span>
+						</div>
+		</div>
+		<script src="assets/scripts/bundle.js"></script>
+	</body>
+</html>

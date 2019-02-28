@@ -1,0 +1,28 @@
+body
+	canvas#canvas
+
+	.counters
+		.time#time-counter
+		.frames#frame-counter
+		.fps#fps-counter
+		
+	.control-panel#control-panel
+		mixin range-control(id, name, min, max, dv, step)
+			.range-control
+				label(for=id)= name
+				input(type="range" autocomplete="off" id=id min=min max=max value=dv step=step)
+				span.control-value
+
+
+		+range-control('rotateX', 'angleX', -360, 360, 30, 1)
+		+range-control('rotateY', 'angleY', -360, 360, -30, 1)
+		+range-control('rotateZ', 'angleZ', -360, 360, 0, 1)
+		+range-control('translateX', 'x', -1, 1, 0, 0.01)
+		+range-control('translateY', 'y', -1, 1, 0, 0.01)
+		+range-control('translateZ', 'z', -10, 5, -3, 0.01)
+		+range-control('scale', 'scale', 0, 5, 1, 0.01)
+		+range-control('eyeX', 'eyeX', -1.5, 1.5, 0, 0.01)
+		+range-control('eyeY', 'eyeY', -1.5, 1.5, 0, 0.01)
+		+range-control('eyeZ', 'eyeZ', 0, 5, 1, 0.01)
+
+	script(src="assets/scripts/bundle.js")
