@@ -24,6 +24,7 @@
     "gulp-tabify": "0.0.2",
     "gulp-typescript": "^5.0.0",
     "gulplog": "^1.0.0",
+    "node-sass": "^4.11.0",
     "tsify": "^4.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.2.2",
