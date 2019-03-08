@@ -15,30 +15,111 @@ const mvpMatrix = mat4.identity(mat4.create())
 mat4.perspective(perspectiveMatrix, degToRad(60), 1, 1, 100)
 
 const $ = function(selector: string, qs?: boolean): HTMLElement {
-	if (!qs) {
-		return document.getElementById(selector)
-	}
+	if (!qs) return document.getElementById(selector)
 	return document.querySelector(selector)
 }
 
-const controlPanel: HTMLElement = $('control-panel')
-const fpsCounter: HTMLElement = $('fps-counter')
-const frameCounter: HTMLElement = $('frame-counter')
-const timeCounter: HTMLElement = $('time-counter')
-const scale: HTMLElement = $('scale')
-const rotX: HTMLElement = $('rotateX')
-const rotY: HTMLElement = $('rotateY')
-const rotZ: HTMLElement = $('rotateZ')
-const trsX: HTMLElement = $('translateX')
-const trsY: HTMLElement = $('translateY')
-const trsZ: HTMLElement = $('translateZ')
-const eyeX: HTMLElement = $('eyeX')
-const eyeY: HTMLElement = $('eyeY')
-const eyeZ: HTMLElement = $('eyeZ')
+interface IScene {
+	modelScale: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	modelRotateX: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	modelRotateY: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	modelRotateZ: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	modelTranslateX: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	modelTranslateY: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	modelTranslateZ: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	cameraX: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	cameraY: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	cameraZ: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+	[key: string]: {
+		readonly elem: HTMLInputElement
+		value: number
+	}
+}
+
+const controlPanel = $('control-panel')
+const fpsCounter = $('fps-counter')
+const frameCounter = $('frame-counter')
+const timeCounter = $('time-counter')
+
+const scene: IScene = {
+	modelScale: {
+		elem: $('modelScale'),
+		value: 0,
+	},
+	modelRotateX: {
+		elem: $('modelRotateX'),
+		value: 0,
+	},
+	modelRotateY: {
+		elem: $('modelRotateY'),
+		value: 0,
+	},
+	modelRotateZ: {
+		elem: $('modelRotateZ'),
+		value: 0,
+	},
+	modelTranslateX: {
+		elem: $('modelTranslateX'),
+		value: 0,
+	},
+	modelTranslateY: {
+		elem: $('modelTranslateY'),
+		value: 0,
+	},
+	modelTranslateZ: {
+		elem: $('modelTranslateZ'),
+		value: 0,
+	},
+	cameraX: {
+		elem: $('cameraX'),
+		value: 0,
+	},
+	cameraY: {
+		elem: $('cameraY'),
+		value: 0,
+	},
+	cameraZ: {
+		elem: $('cameraZ'),
+		value: 0,
+	},
+}
 
 controlPanel.oninput = function(e: Event) {
 	const input: any = e.target
-	const value: any = parseFloat(input.value).toFixed(2)
+	const value: number = +parseFloat(input.value).toFixed(2)
+
+	scene[input.id].value = value
+
 	input.nextSibling.innerHTML = value
 }
 
@@ -116,37 +197,29 @@ const drawScene = function() {
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	const eye = vec3.fromValues(
-		parseFloat((eyeX as HTMLInputElement).value),
-		parseFloat((eyeY as HTMLInputElement).value),
-		parseFloat((eyeZ as HTMLInputElement).value),
-	)
+	const camera = vec3.fromValues(scene.cameraX.value, scene.cameraY.value, scene.cameraZ.value)
 	const center = vec3.fromValues(0, 0, 0)
 	const up = vec3.fromValues(0, 1, 0)
 
-	mat4.lookAt(viewMatrix, eye, center, up)
+	mat4.lookAt(viewMatrix, camera, center, up)
 
 	mat4.identity(modelMatrix)
 	mat4.translate(
 		modelMatrix,
 		modelMatrix,
 		vec3.fromValues(
-			parseFloat((trsX as HTMLInputElement).value),
-			parseFloat((trsY as HTMLInputElement).value),
-			parseFloat((trsZ as HTMLInputElement).value),
+			scene.modelTranslateX.value,
+			scene.modelTranslateY.value,
+			scene.modelTranslateZ.value,
 		),
 	)
-	mat4.rotateX(modelMatrix, modelMatrix, degToRad((rotX as HTMLInputElement).value))
-	mat4.rotateY(modelMatrix, modelMatrix, degToRad((rotY as HTMLInputElement).value))
-	mat4.rotateZ(modelMatrix, modelMatrix, degToRad((rotZ as HTMLInputElement).value))
+	mat4.rotateX(modelMatrix, modelMatrix, degToRad(scene.modelRotateX.value))
+	mat4.rotateY(modelMatrix, modelMatrix, degToRad(scene.modelRotateY.value))
+	mat4.rotateZ(modelMatrix, modelMatrix, degToRad(scene.modelRotateZ.value))
 	mat4.scale(
 		modelMatrix,
 		modelMatrix,
-		vec3.fromValues(
-			parseFloat((scale as HTMLInputElement).value),
-			parseFloat((scale as HTMLInputElement).value),
-			parseFloat((scale as HTMLInputElement).value),
-		),
+		vec3.fromValues(scene.modelScale.value, scene.modelScale.value, scene.modelScale.value),
 	)
 	mat4.mul(modelViewMatrix, viewMatrix, modelMatrix)
 	mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix)
@@ -194,7 +267,7 @@ const webGLStart = function() {
 		.then(() => initVariables())
 		.then(() => initTextures())
 		.then(() => initBuffer())
-		.then((n) => render())
+		.then((indices) => render())
 		.catch((error: Error) => console.error(error))
 }
 // prettier-ignore
@@ -202,11 +275,24 @@ window.onload = function() {
 	[].forEach.call(
 		controlPanel.children,
 		(child: HTMLElement) =>
-			(child.children[2].innerHTML = parseFloat(child.children[1].getAttribute('value')).toFixed(
-				2,
-			)),
+			(child.children[2].innerHTML = parseFloat(child.children[1].getAttribute('value')).toFixed(2))
 	)
+
+	for (const key in scene) {
+		scene[key].value = +parseFloat(scene[key].elem.value)
+	}
+
 	webGLStart()
 }
 
 window.addEventListener('resize', (e) => resizeCanvasToDisplaySize(gl.canvas))
+window.addEventListener('wheel', (e: WheelEvent) => {
+	const direction = e.deltaY < 0 ? -0.15 : 0.15
+	scene.cameraZ.elem.value = `${scene.cameraZ.value + direction}`
+	scene.cameraZ.elem.dispatchEvent(
+		new Event('input', {
+			bubbles: true,
+			cancelable: true,
+		}),
+	)
+})

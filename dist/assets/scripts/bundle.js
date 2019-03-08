@@ -22,10 +22,7 @@ var mvpMatrix = webgl_matrix_1.mat4.identity(webgl_matrix_1.mat4.create());
 webgl_matrix_1.mat4.perspective(perspectiveMatrix, webgl_google_utils_1.degToRad(60), 1, 1, 100);
 
 var $ = function $(selector, qs) {
-  if (!qs) {
-    return document.getElementById(selector);
-  }
-
+  if (!qs) return document.getElementById(selector);
   return document.querySelector(selector);
 };
 
@@ -33,20 +30,53 @@ var controlPanel = $('control-panel');
 var fpsCounter = $('fps-counter');
 var frameCounter = $('frame-counter');
 var timeCounter = $('time-counter');
-var scale = $('scale');
-var rotX = $('rotateX');
-var rotY = $('rotateY');
-var rotZ = $('rotateZ');
-var trsX = $('translateX');
-var trsY = $('translateY');
-var trsZ = $('translateZ');
-var eyeX = $('eyeX');
-var eyeY = $('eyeY');
-var eyeZ = $('eyeZ');
+var scene = {
+  modelScale: {
+    elem: $('modelScale'),
+    value: 0
+  },
+  modelRotateX: {
+    elem: $('modelRotateX'),
+    value: 0
+  },
+  modelRotateY: {
+    elem: $('modelRotateY'),
+    value: 0
+  },
+  modelRotateZ: {
+    elem: $('modelRotateZ'),
+    value: 0
+  },
+  modelTranslateX: {
+    elem: $('modelTranslateX'),
+    value: 0
+  },
+  modelTranslateY: {
+    elem: $('modelTranslateY'),
+    value: 0
+  },
+  modelTranslateZ: {
+    elem: $('modelTranslateZ'),
+    value: 0
+  },
+  cameraX: {
+    elem: $('cameraX'),
+    value: 0
+  },
+  cameraY: {
+    elem: $('cameraY'),
+    value: 0
+  },
+  cameraZ: {
+    elem: $('cameraZ'),
+    value: 0
+  }
+};
 
 controlPanel.oninput = function (e) {
   var input = e.target;
-  var value = parseFloat(input.value).toFixed(2);
+  var value = +parseFloat(input.value).toFixed(2);
+  scene[input.id].value = value;
   input.nextSibling.innerHTML = value;
 };
 
@@ -97,16 +127,16 @@ var initBuffer = function initBuffer() {
 var drawScene = function drawScene() {
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  var eye = webgl_matrix_1.vec3.fromValues(parseFloat(eyeX.value), parseFloat(eyeY.value), parseFloat(eyeZ.value));
+  var camera = webgl_matrix_1.vec3.fromValues(scene.cameraX.value, scene.cameraY.value, scene.cameraZ.value);
   var center = webgl_matrix_1.vec3.fromValues(0, 0, 0);
   var up = webgl_matrix_1.vec3.fromValues(0, 1, 0);
-  webgl_matrix_1.mat4.lookAt(viewMatrix, eye, center, up);
+  webgl_matrix_1.mat4.lookAt(viewMatrix, camera, center, up);
   webgl_matrix_1.mat4.identity(modelMatrix);
-  webgl_matrix_1.mat4.translate(modelMatrix, modelMatrix, webgl_matrix_1.vec3.fromValues(parseFloat(trsX.value), parseFloat(trsY.value), parseFloat(trsZ.value)));
-  webgl_matrix_1.mat4.rotateX(modelMatrix, modelMatrix, webgl_google_utils_1.degToRad(rotX.value));
-  webgl_matrix_1.mat4.rotateY(modelMatrix, modelMatrix, webgl_google_utils_1.degToRad(rotY.value));
-  webgl_matrix_1.mat4.rotateZ(modelMatrix, modelMatrix, webgl_google_utils_1.degToRad(rotZ.value));
-  webgl_matrix_1.mat4.scale(modelMatrix, modelMatrix, webgl_matrix_1.vec3.fromValues(parseFloat(scale.value), parseFloat(scale.value), parseFloat(scale.value)));
+  webgl_matrix_1.mat4.translate(modelMatrix, modelMatrix, webgl_matrix_1.vec3.fromValues(scene.modelTranslateX.value, scene.modelTranslateY.value, scene.modelTranslateZ.value));
+  webgl_matrix_1.mat4.rotateX(modelMatrix, modelMatrix, webgl_google_utils_1.degToRad(scene.modelRotateX.value));
+  webgl_matrix_1.mat4.rotateY(modelMatrix, modelMatrix, webgl_google_utils_1.degToRad(scene.modelRotateY.value));
+  webgl_matrix_1.mat4.rotateZ(modelMatrix, modelMatrix, webgl_google_utils_1.degToRad(scene.modelRotateZ.value));
+  webgl_matrix_1.mat4.scale(modelMatrix, modelMatrix, webgl_matrix_1.vec3.fromValues(scene.modelScale.value, scene.modelScale.value, scene.modelScale.value));
   webgl_matrix_1.mat4.mul(modelViewMatrix, viewMatrix, modelMatrix);
   webgl_matrix_1.mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix);
   gl.uniformMatrix4fv(uniforms.uMvpMatrix, false, mvpMatrix);
@@ -151,7 +181,7 @@ var webGLStart = function webGLStart() {
     return initTextures();
   }).then(function () {
     return initBuffer();
-  }).then(function (n) {
+  }).then(function (indices) {
     return render();
   }).catch(function (error) {
     return console.error(error);
@@ -163,11 +193,24 @@ window.onload = function () {
   [].forEach.call(controlPanel.children, function (child) {
     return child.children[2].innerHTML = parseFloat(child.children[1].getAttribute('value')).toFixed(2);
   });
+
+  for (var key in scene) {
+    scene[key].value = +parseFloat(scene[key].elem.value);
+  }
+
   webGLStart();
 };
 
 window.addEventListener('resize', function (e) {
   return webgl_utils_1.resizeCanvasToDisplaySize(gl.canvas);
+});
+window.addEventListener('wheel', function (e) {
+  var direction = e.deltaY < 0 ? -0.15 : 0.15;
+  scene.cameraZ.elem.value = "".concat(scene.cameraZ.value + direction);
+  scene.cameraZ.elem.dispatchEvent(new Event('input', {
+    bubbles: true,
+    cancelable: true
+  }));
 });
 
 },{"./webgl-google-utils":2,"./webgl-matrix":3,"./webgl-utils":4}],2:[function(require,module,exports){

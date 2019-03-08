@@ -87,10 +87,10 @@ gulp.task('build', (done) => {
 
 gulp.task('watch', (done) => {
 	gulp.watch('src/shaders/*', gulp.series('shaders'))
-	gulp.watch('src/images/*', gulp.series('images'))
-	gulp.watch('src/**/*+(pug|jade)', gulp.series('pug'))
-	gulp.watch('src/**/*.scss', gulp.series('sass'))
 	gulp.watch('src/**/*.(ts|js)', gulp.series('build'))
+	gulp.watch('src/**/*+(pug|jade)', gulp.series('pug'))
+	// gulp.watch('src/**/*.scss', gulp.series('sass'))
+	// gulp.watch('src/images/*', gulp.series('images'))
 	done()
 })
 

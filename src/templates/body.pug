@@ -13,16 +13,15 @@ body
 				input(type="range" autocomplete="off" id=id min=min max=max value=dv step=step)
 				span.control-value
 
-
-		+range-control('rotateX', 'angleX', -360, 360, 30, 1)
-		+range-control('rotateY', 'angleY', -360, 360, -30, 1)
-		+range-control('rotateZ', 'angleZ', -360, 360, 0, 1)
-		+range-control('translateX', 'x', -1, 1, 0, 0.01)
-		+range-control('translateY', 'y', -1, 1, 0, 0.01)
-		+range-control('translateZ', 'z', -10, 5, -3, 0.01)
-		+range-control('scale', 'scale', 0, 5, 1, 0.01)
-		+range-control('eyeX', 'eyeX', -1.5, 1.5, 0, 0.01)
-		+range-control('eyeY', 'eyeY', -1.5, 1.5, 0, 0.01)
-		+range-control('eyeZ', 'eyeZ', 0, 5, 1, 0.01)
+		+range-control('modelRotateX', 'angleX', -360, 360, 0, 1)
+		+range-control('modelRotateY', 'angleY', -360, 360, 0, 1)
+		+range-control('modelRotateZ', 'angleZ', -360, 360, 0, 1)
+		+range-control('modelTranslateX', 'x', -1, 1, 0, 0.01)
+		+range-control('modelTranslateY', 'y', -1, 1, 0, 0.01)
+		+range-control('modelTranslateZ', 'z', -10, 5, -3, 0.01)
+		+range-control('modelScale', 'scale', 0, 5, 1, 0.01)
+		+range-control('cameraX', 'eyeX', -1.5, 1.5, 0, 0.01)
+		+range-control('cameraY', 'eyeY', -1.5, 1.5, 0, 0.01)
+		+range-control('cameraZ', 'eyeZ', 0.01, 5, 1, 0.01)
 
 	script(src="assets/scripts/bundle.js")
