@@ -73,43 +73,43 @@ const timeCounter = $('time-counter')
 
 const scene: IScene = {
 	modelScale: {
-		elem: $('modelScale'),
+		elem: <HTMLInputElement>$('modelScale'),
 		value: 0,
 	},
 	modelRotateX: {
-		elem: $('modelRotateX'),
+		elem: <HTMLInputElement>$('modelRotateX'),
 		value: 0,
 	},
 	modelRotateY: {
-		elem: $('modelRotateY'),
+		elem: <HTMLInputElement>$('modelRotateY'),
 		value: 0,
 	},
 	modelRotateZ: {
-		elem: $('modelRotateZ'),
+		elem: <HTMLInputElement>$('modelRotateZ'),
 		value: 0,
 	},
 	modelTranslateX: {
-		elem: $('modelTranslateX'),
+		elem: <HTMLInputElement>$('modelTranslateX'),
 		value: 0,
 	},
 	modelTranslateY: {
-		elem: $('modelTranslateY'),
+		elem: <HTMLInputElement>$('modelTranslateY'),
 		value: 0,
 	},
 	modelTranslateZ: {
-		elem: $('modelTranslateZ'),
+		elem: <HTMLInputElement>$('modelTranslateZ'),
 		value: 0,
 	},
 	cameraX: {
-		elem: $('cameraX'),
+		elem: <HTMLInputElement>$('cameraX'),
 		value: 0,
 	},
 	cameraY: {
-		elem: $('cameraY'),
+		elem: <HTMLInputElement>$('cameraY'),
 		value: 0,
 	},
 	cameraZ: {
-		elem: $('cameraZ'),
+		elem: <HTMLInputElement>$('cameraZ'),
 		value: 0,
 	},
 }
@@ -232,7 +232,7 @@ const drawScene = function() {
 	gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_BYTE, 0)
 }
 
-let lastTime: number = 0
+let lastTime: number = <number>0
 let frames: number = 0
 let fps: number | string
 const render = function(time: DOMHighResTimeStamp = 0) {

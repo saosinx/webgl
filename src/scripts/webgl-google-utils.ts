@@ -67,7 +67,7 @@ export function getRotationFromMatrix(matrix: number[]) {
 }
 
 export function degToRad(degrees: number | string): number {
-	return (parseFloat(degrees as string) * Math.PI) / 180
+	return (parseFloat(<string>degrees) * Math.PI) / 180
 }
 
 export function getMousePosition(event: MouseEvent) {
@@ -317,7 +317,7 @@ const WebGLUtils = (function() {
 		function handleCreationError(msg: string): void {
 			const container: Node = canvas.parentNode
 			if (container) {
-				let str = (window as any).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
+				let str = (<any>window).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
 				if (msg) {
 					str += '<br/><br/>Status: ' + msg
 				}
@@ -334,7 +334,7 @@ const WebGLUtils = (function() {
 		}
 		const context = create3DContext(canvas, opt_attribs)
 		if (!context) {
-			if (!(window as any).WebGLRenderingContext) {
+			if (!(<any>window).WebGLRenderingContext) {
 				opt_onError('')
 			}
 		}
@@ -371,11 +371,11 @@ const WebGLUtils = (function() {
 
 window.requestAnimationFrame = (function() {
 	return (
-		(window as any).requestAnimationFrame ||
-		(window as any).webkitRequestAnimationFrame ||
-		(window as any).mozRequestAnimationFrame ||
-		(window as any).oRequestAnimationFrame ||
-		(window as any).msRequestAnimationFrame ||
+		(<any>window).requestAnimationFrame ||
+		(<any>window).webkitRequestAnimationFrame ||
+		(<any>window).mozRequestAnimationFrame ||
+		(<any>window).oRequestAnimationFrame ||
+		(<any>window).msRequestAnimationFrame ||
 		function(callback: () => void) {
 			window.setTimeout(callback, 1000 / 15)
 		}
