@@ -47,7 +47,7 @@ export function createProgram(
 	shaders: WebGLShader[],
 	opt_attribs?: string[],
 	opt_locations?: number[],
-	opt_errorCallback?: any,
+	opt_errorCallback?: any
 ): WebGLProgram {
 	const errFn = opt_errorCallback || console.error
 	const program: WebGLProgram = gl.createProgram()
@@ -56,7 +56,7 @@ export function createProgram(
 
 	if (opt_attribs) {
 		opt_attribs.forEach((attrib, ndx) =>
-			gl.bindAttribLocation(program, opt_locations ? opt_locations[ndx] : ndx, attrib),
+			gl.bindAttribLocation(program, opt_locations ? opt_locations[ndx] : ndx, attrib)
 		)
 	}
 
@@ -85,7 +85,7 @@ export function createProgram(
  */
 export function resizeCanvasToDisplaySize(
 	canvas: HTMLCanvasElement,
-	multiplier: number = 1,
+	multiplier: number = 1
 ): boolean {
 	const width = (canvas.clientWidth * multiplier) | 0
 	const height = (canvas.clientHeight * multiplier) | 0
@@ -120,7 +120,7 @@ export function createShader(
 	gl: WebGLRenderingContext,
 	type: string,
 	resolve: (value: WebGLShader | PromiseLike<{}>) => void,
-	reject: (reason: Error) => void,
+	reject: (reason: Error) => void
 ) {
 	function handleShader(data: string): WebGLShader {
 		let shader: WebGLShader

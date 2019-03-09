@@ -67,7 +67,7 @@ export function getRotationFromMatrix(matrix: number[]) {
 }
 
 export function degToRad(degrees: number | string): number {
-	return (parseFloat(<string>degrees) * Math.PI) / 180
+	return (parseFloat(degrees as string) * Math.PI) / 180
 }
 
 export function getMousePosition(event: MouseEvent) {
@@ -79,7 +79,7 @@ export function getNodeFromMouse(
 	mouse: MouseEvent,
 	gridSize: number,
 	GRID_WIDTH: number,
-	GRID_HEIGHT: number,
+	GRID_HEIGHT: number
 ) {
 	// We're getting it in this format: left=0, right=gridSize. Same with top and bottom.
 	// First, let's see what the grid looks like compared to the canvas.
@@ -104,7 +104,7 @@ export function getCoordinateFromMouse(
 	mouse: MouseEvent,
 	gridSize: number,
 	GRID_WIDTH: number,
-	GRID_HEIGHT: number,
+	GRID_HEIGHT: number
 ) {
 	// We're getting it in this format: left=0, right=gridSize. Same with top and bottom.
 	// First, let's see what the grid looks like compared to the canvas.
@@ -312,12 +312,12 @@ const WebGLUtils = (function() {
 	const setupWebGL = function(
 		canvas: HTMLCanvasElement,
 		opt_attribs?: object,
-		opt_onError?: any,
+		opt_onError?: any
 	): WebGLRenderingContext | CanvasRenderingContext2D {
 		function handleCreationError(msg: string): void {
 			const container: Node = canvas.parentNode
 			if (container) {
-				let str = (<any>window).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
+				let str = (window as any).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
 				if (msg) {
 					str += '<br/><br/>Status: ' + msg
 				}
@@ -329,12 +329,12 @@ const WebGLUtils = (function() {
 
 		if (canvas.addEventListener) {
 			canvas.addEventListener('webglcontextcreationerror', (event: WebGLContextEvent) =>
-				opt_onError(event.statusMessage),
+				opt_onError(event.statusMessage)
 			)
 		}
 		const context = create3DContext(canvas, opt_attribs)
 		if (!context) {
-			if (!(<any>window).WebGLRenderingContext) {
+			if (!(window as any).WebGLRenderingContext) {
 				opt_onError('')
 			}
 		}
@@ -349,7 +349,7 @@ const WebGLUtils = (function() {
 	 */
 	const create3DContext = function(
 		canvas: HTMLCanvasElement,
-		opt_attribs?: object,
+		opt_attribs?: object
 	): WebGLRenderingContext | CanvasRenderingContext2D {
 		const names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']
 		let context = null
@@ -371,11 +371,11 @@ const WebGLUtils = (function() {
 
 window.requestAnimationFrame = (function() {
 	return (
-		(<any>window).requestAnimationFrame ||
-		(<any>window).webkitRequestAnimationFrame ||
-		(<any>window).mozRequestAnimationFrame ||
-		(<any>window).oRequestAnimationFrame ||
-		(<any>window).msRequestAnimationFrame ||
+		(window as any).requestAnimationFrame ||
+		(window as any).webkitRequestAnimationFrame ||
+		(window as any).mozRequestAnimationFrame ||
+		(window as any).oRequestAnimationFrame ||
+		(window as any).msRequestAnimationFrame ||
 		function(callback: () => void) {
 			window.setTimeout(callback, 1000 / 15)
 		}

@@ -68,58 +68,57 @@ interface IScene {
 
 const scene: IScene = {
 	modelScale: {
-		elem: <HTMLElement>$('modelScale'),
+		elem: $('modelScale') as HTMLElement,
 		value: 0,
 	},
 	modelRotateX: {
-		elem: <HTMLElement>$('modelRotateX'),
+		elem: $('modelRotateX') as HTMLElement,
 		value: 0,
 	},
 	modelRotateY: {
-		elem: <HTMLElement>$('modelRotateY'),
+		elem: $('modelRotateY') as HTMLElement,
 		value: 0,
 	},
 	modelRotateZ: {
-		elem: <HTMLElement>$('modelRotateZ'),
+		elem: $('modelRotateZ') as HTMLElement,
 		value: 0,
 	},
 	modelTranslateX: {
-		elem: <HTMLElement>$('modelTranslateX'),
+		elem: $('modelTranslateX') as HTMLElement,
 		value: 0,
 	},
 	modelTranslateY: {
-		elem: <HTMLElement>$('modelTranslateY'),
+		elem: $('modelTranslateY') as HTMLElement,
 		value: 0,
 	},
 	modelTranslateZ: {
-		elem: <HTMLElement>$('modelTranslateZ'),
+		elem: $('modelTranslateZ') as HTMLElement,
 		value: 0,
 	},
 	cameraX: {
-		elem: <HTMLElement>$('cameraX'),
+		elem: $('cameraX') as HTMLElement,
 		value: 0,
 	},
 	cameraY: {
-		elem: <HTMLElement>$('cameraY'),
+		elem: $('cameraY') as HTMLElement,
 		value: 0,
 	},
 	cameraZ: {
-		elem: <HTMLElement>$('cameraZ'),
+		elem: $('cameraZ') as HTMLElement,
 		value: 0,
 	},
 }
 
-const controlPanel = $('control-panel')
 const fpsCounter = $('fps-counter')
 const frameCounter = $('frame-counter')
 const timeCounter = $('time-counter')
 
 const initShaders = function(resolve: () => void, reject: (err: Error) => void) {
 	const fShader: WebGLShader = new Promise((res, rej) =>
-		createShader(gl, 'fragment-shader', res, rej),
+		createShader(gl, 'fragment-shader', res, rej)
 	)
 	const vShader: WebGLShader = new Promise((res, rej) =>
-		createShader(gl, 'vertex-shader', res, rej),
+		createShader(gl, 'vertex-shader', res, rej)
 	)
 
 	Promise.all([fShader, vShader]).then((shaders) => {
@@ -201,8 +200,8 @@ const drawScene = function() {
 		vec3.fromValues(
 			scene.modelTranslateX.value,
 			scene.modelTranslateY.value,
-			scene.modelTranslateZ.value,
-		),
+			scene.modelTranslateZ.value
+		)
 	)
 	mat4.rotateX(modelMatrix, modelMatrix, degToRad(scene.modelRotateX.value))
 	mat4.rotateY(modelMatrix, modelMatrix, degToRad(scene.modelRotateY.value))
@@ -210,7 +209,7 @@ const drawScene = function() {
 	mat4.scale(
 		modelMatrix,
 		modelMatrix,
-		vec3.fromValues(scene.modelScale.value, scene.modelScale.value, scene.modelScale.value),
+		vec3.fromValues(scene.modelScale.value, scene.modelScale.value, scene.modelScale.value)
 	)
 	mat4.mul(modelViewMatrix, viewMatrix, modelMatrix)
 	mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix)
@@ -223,12 +222,12 @@ const drawScene = function() {
 	gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_BYTE, 0)
 }
 
-let lastTime: number = <number>0
+let lastTime: number = 0
 let frames: number = 0
-let fps: number | string
+let fps: number
 const render = function(time: DOMHighResTimeStamp = 0) {
-	fps = (1000 / (time - lastTime)).toFixed(0)
-	fpsCounter.textContent = fps
+	fps = 1000 / (time - lastTime)
+	fpsCounter.textContent = fps.toFixed(0)
 	frameCounter.textContent = ++frames + ''
 	timeCounter.textContent = (time / 1000).toFixed(2)
 	lastTime = time
@@ -251,8 +250,6 @@ const webGLStart = function() {
 
 	resizeCanvasToDisplaySize(gl.canvas)
 
-	console.log(gl)
-
 	const promiseShader = new Promise((res, rej) => initShaders(res, rej))
 	promiseShader
 		.then(() => initVariables())
@@ -274,18 +271,36 @@ const setCanvasControls = function(): void {
 	gl.canvas.addEventListener('mousemove', (e: MouseEvent) => {
 		if (!isRotatable) return false
 
-		scene.modelRotateX.value += e.movementY
-		scene.modelRotateY.value += e.movementX
+		if (e.shiftKey) {
+			scene.modelTranslateX.value += 10 * (e.movementX / gl.drawingBufferWidth)
+			scene.modelTranslateY.value -= 10 * (e.movementY / gl.drawingBufferWidth)
+
+			updateInfobar(scene.modelTranslateX.elem)
+			updateInfobar(scene.modelTranslateY.elem)
+
+			return
+		}
+
+		scene.modelRotateX.value += e.movementY / 3
+		scene.modelRotateY.value += e.movementX / 3
 
 		updateInfobar(scene.modelRotateX.elem)
 		updateInfobar(scene.modelRotateY.elem)
 	})
+
+	gl.canvas.addEventListener('wheel', (e: WheelEvent) => {
+		let direction = e.deltaY < 0 ? -0.15 : 0.15
+		if (e.shiftKey) direction *= 3
+		scene.cameraZ.value += direction
+		updateInfobar(scene.cameraZ.elem)
+	})
 }
 
-// prettier-ignore
 window.onload = function() {
 	for (const key in scene) {
-		scene[key].value = +parseFloat(scene[key].elem.innerHTML)
+		if (scene.hasOwnProperty(key)) {
+			scene[key].value = +parseFloat(scene[key].elem.innerHTML)
+		}
 	}
 
 	webGLStart()
@@ -293,8 +308,3 @@ window.onload = function() {
 }
 
 window.addEventListener('resize', (e: Event) => resizeCanvasToDisplaySize(gl.canvas))
-window.addEventListener('wheel', (e: WheelEvent) => {
-	const direction = e.deltaY < 0 ? -0.15 : 0.15
-	scene.cameraZ.value += direction
-	updateInfobar(scene.cameraZ.elem)
-})
