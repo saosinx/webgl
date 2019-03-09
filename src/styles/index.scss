@@ -68,9 +68,9 @@ canvas {
 	padding-top: 1.25rem;
 
 	.range-control {
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
+		display: grid;
+		grid-template: 1fr / 1fr 1fr;
+		grid-column-gap: 15px;
 	}
 
 	.range-control + .range-control {
@@ -78,19 +78,16 @@ canvas {
 	}
 
 	label,
+	.control-name,
 	.control-value {
 		color: #eee;
 		font-size: 1em;
 		margin-top: -2px;
 	}
 
-	label {
-		width: 4.375rem;
+	label,
+	.conrol-name {
 		text-align: right;
-	}
-
-	.control-value {
-		width: 4.375rem;
 	}
 }
 

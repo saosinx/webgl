@@ -21,107 +21,98 @@ const $ = function(selector: string, qs?: boolean): HTMLElement {
 
 interface IScene {
 	modelScale: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	modelRotateX: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	modelRotateY: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	modelRotateZ: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	modelTranslateX: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	modelTranslateY: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	modelTranslateZ: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	cameraX: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	cameraY: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	cameraZ: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
 	[key: string]: {
-		readonly elem: HTMLInputElement
+		readonly elem: HTMLElement
 		value: number
 	}
+}
+
+const scene: IScene = {
+	modelScale: {
+		elem: <HTMLElement>$('modelScale'),
+		value: 0,
+	},
+	modelRotateX: {
+		elem: <HTMLElement>$('modelRotateX'),
+		value: 0,
+	},
+	modelRotateY: {
+		elem: <HTMLElement>$('modelRotateY'),
+		value: 0,
+	},
+	modelRotateZ: {
+		elem: <HTMLElement>$('modelRotateZ'),
+		value: 0,
+	},
+	modelTranslateX: {
+		elem: <HTMLElement>$('modelTranslateX'),
+		value: 0,
+	},
+	modelTranslateY: {
+		elem: <HTMLElement>$('modelTranslateY'),
+		value: 0,
+	},
+	modelTranslateZ: {
+		elem: <HTMLElement>$('modelTranslateZ'),
+		value: 0,
+	},
+	cameraX: {
+		elem: <HTMLElement>$('cameraX'),
+		value: 0,
+	},
+	cameraY: {
+		elem: <HTMLElement>$('cameraY'),
+		value: 0,
+	},
+	cameraZ: {
+		elem: <HTMLElement>$('cameraZ'),
+		value: 0,
+	},
 }
 
 const controlPanel = $('control-panel')
 const fpsCounter = $('fps-counter')
 const frameCounter = $('frame-counter')
 const timeCounter = $('time-counter')
-
-const scene: IScene = {
-	modelScale: {
-		elem: <HTMLInputElement>$('modelScale'),
-		value: 0,
-	},
-	modelRotateX: {
-		elem: <HTMLInputElement>$('modelRotateX'),
-		value: 0,
-	},
-	modelRotateY: {
-		elem: <HTMLInputElement>$('modelRotateY'),
-		value: 0,
-	},
-	modelRotateZ: {
-		elem: <HTMLInputElement>$('modelRotateZ'),
-		value: 0,
-	},
-	modelTranslateX: {
-		elem: <HTMLInputElement>$('modelTranslateX'),
-		value: 0,
-	},
-	modelTranslateY: {
-		elem: <HTMLInputElement>$('modelTranslateY'),
-		value: 0,
-	},
-	modelTranslateZ: {
-		elem: <HTMLInputElement>$('modelTranslateZ'),
-		value: 0,
-	},
-	cameraX: {
-		elem: <HTMLInputElement>$('cameraX'),
-		value: 0,
-	},
-	cameraY: {
-		elem: <HTMLInputElement>$('cameraY'),
-		value: 0,
-	},
-	cameraZ: {
-		elem: <HTMLInputElement>$('cameraZ'),
-		value: 0,
-	},
-}
-
-controlPanel.oninput = function(e: Event) {
-	const input: any = e.target
-	const value: number = +parseFloat(input.value).toFixed(2)
-
-	scene[input.id].value = value
-
-	input.nextSibling.innerHTML = value
-}
 
 const initShaders = function(resolve: () => void, reject: (err: Error) => void) {
 	const fShader: WebGLShader = new Promise((res, rej) =>
@@ -270,29 +261,40 @@ const webGLStart = function() {
 		.then((indices) => render())
 		.catch((error: Error) => console.error(error))
 }
+
+const updateInfobar = function(elem: HTMLElement) {
+	elem.innerHTML = scene[elem.id].value.toFixed(2)
+}
+
+const setCanvasControls = function(): void {
+	let isRotatable = false
+
+	gl.canvas.addEventListener('mousedown', (e: MouseEvent) => (isRotatable = true))
+	gl.canvas.addEventListener('mouseup', (e: MouseEvent) => (isRotatable = false))
+	gl.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+		if (!isRotatable) return false
+
+		scene.modelRotateX.value += e.movementY
+		scene.modelRotateY.value += e.movementX
+
+		updateInfobar(scene.modelRotateX.elem)
+		updateInfobar(scene.modelRotateY.elem)
+	})
+}
+
 // prettier-ignore
 window.onload = function() {
-	[].forEach.call(
-		controlPanel.children,
-		(child: HTMLElement) =>
-			(child.children[2].innerHTML = parseFloat(child.children[1].getAttribute('value')).toFixed(2))
-	)
-
 	for (const key in scene) {
-		scene[key].value = +parseFloat(scene[key].elem.value)
+		scene[key].value = +parseFloat(scene[key].elem.innerHTML)
 	}
 
 	webGLStart()
+	setCanvasControls()
 }
 
-window.addEventListener('resize', (e) => resizeCanvasToDisplaySize(gl.canvas))
+window.addEventListener('resize', (e: Event) => resizeCanvasToDisplaySize(gl.canvas))
 window.addEventListener('wheel', (e: WheelEvent) => {
 	const direction = e.deltaY < 0 ? -0.15 : 0.15
-	scene.cameraZ.elem.value = `${scene.cameraZ.value + direction}`
-	scene.cameraZ.elem.dispatchEvent(
-		new Event('input', {
-			bubbles: true,
-			cancelable: true,
-		}),
-	)
+	scene.cameraZ.value += direction
+	updateInfobar(scene.cameraZ.elem)
 })
