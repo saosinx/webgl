@@ -136,11 +136,11 @@ export function addTexture(
 		}
 	}
 
-	interface WebGLExtendedTexture extends WebGLTexture {
+	interface IWebGLTextureExtended extends WebGLTexture {
 		image?: HTMLImageElement
 	}
 
-	const texture: WebGLExtendedTexture = gl.createTexture()
+	const texture: IWebGLTextureExtended = gl.createTexture()
 	texture.image = new Image()
 	texture.image.onload = function(): void {
 		gl.activeTexture(glTexture)
@@ -167,8 +167,8 @@ export function ease(from: number, to: number, easiness: number): number {
 }
 
 export function displayAlertMatrix(matrix: number[]): void {
-	let testString = ''
-	for (let i = 0, l = matrix.length; i < l; i++) {
+	let testString: string = ''
+	for (let i: number = 0, l: number = matrix.length; i < l; i++) {
 		if (i % 4 === 0 && i > 0) {
 			testString += '\n'
 		}
@@ -179,7 +179,7 @@ export function displayAlertMatrix(matrix: number[]): void {
 }
 
 export function addVectors(vec1: number[], vec2: number[]): number[] {
-	for (let i = 0, l = vec1.length; i < l; i++) {
+	for (let i: number = 0, l: number = vec1.length; i < l; i++) {
 		if (vec2[i]) {
 			vec1[i] += vec2[i]
 		}
@@ -187,7 +187,7 @@ export function addVectors(vec1: number[], vec2: number[]): number[] {
 	return vec1
 }
 export function subtractVectors(vec1: number[], vec2: number[]): number[] {
-	for (let i = 0, l = vec1.length; i < l; i++) {
+	for (let i: number = 0, l: number = vec1.length; i < l; i++) {
 		if (vec2[i]) {
 			vec1[i] -= vec2[i]
 		}
@@ -196,17 +196,17 @@ export function subtractVectors(vec1: number[], vec2: number[]): number[] {
 }
 
 export function inverseVector(vec: number[]): number[] {
-	for (let i = 0, l = vec.length; i < l; i++) {
+	for (let i: number = 0, l: number = vec.length; i < l; i++) {
 		vec[i] = 1 - Math.abs(vec[i])
 	}
 	return vec
 }
 
 export function alertMat4(mat: number[]): void {
-	let string = '['
+	let string: string = '['
 
-	for (let i = 0; i < 4; i++) {
-		for (let j = 0; j < 4; j++) {
+	for (let i: number = 0; i < 4; i++) {
+		for (let j: number = 0; j < 4; j++) {
 			string += Math.round(mat[i * 4 + j]).toString() + ', \t'
 		}
 		string += '\n'
@@ -220,8 +220,8 @@ export function Float32Concat(original: number[], addition: number[]): Float32Ar
 		return addition
 	}
 
-	const length = original.length
-	const totalLength = length + addition.length
+	const length: number = original.length
+	const totalLength: number = length + addition.length
 
 	const result = new Float32Array(totalLength)
 
@@ -231,8 +231,8 @@ export function Float32Concat(original: number[], addition: number[]): Float32Ar
 	return result
 }
 
-let totalTimePassed = 0
-let lastTimePassed = 0
+let totalTimePassed: number = 0
+let lastTimePassed: number = 0
 export function ConsoleTimePassed(message: string): void {
 	totalTimePassed = new Date().getTime()
 	console.log(message + ': ' + (totalTimePassed - lastTimePassed))
@@ -256,9 +256,9 @@ export function getBetweenVec(min: number[], range: number[]): number[] {
 }
 
 export function normalize(vec: number[]): number[] {
-	let i = 0
-	let total = 0
-	const l = vec.length
+	let i: number = 0
+	let total: number = 0
+	const l: number = vec.length
 	for (i = 0; i < l; i++) {
 		total += vec[i]
 	}
@@ -268,7 +268,17 @@ export function normalize(vec: number[]): number[] {
 	return vec
 }
 
-const WebGLUtils = (function() {
+const WebGLUtils = (function(): {
+	setupWebGL: (
+		canvas: HTMLCanvasElement,
+		opt_attribs?: object,
+		opt_onError?: any
+	) => CanvasRenderingContext2D | WebGLRenderingContext | null
+	create3DContext: (
+		canvas: HTMLCanvasElement,
+		opt_attribs?: object
+	) => CanvasRenderingContext2D | WebGLRenderingContext | null
+} {
 	/**
 	 * Creates the HTLM for a failure message
 	 * @param {string} canvasContainerId id of container of th
@@ -321,11 +331,13 @@ const WebGLUtils = (function() {
 		canvas: HTMLCanvasElement,
 		opt_attribs?: object,
 		opt_onError?: any
-	): WebGLRenderingContext | CanvasRenderingContext2D {
+	): CanvasRenderingContext2D | WebGLRenderingContext | null {
 		function handleCreationError(msg: string): void {
 			const container: Node = canvas.parentNode
 			if (container) {
-				let str = (window as any).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
+				let str: string = (window as any).WebGLRenderingContext
+					? OTHER_PROBLEM
+					: GET_A_WEBGL_BROWSER
 				if (msg) {
 					str += '<br/><br/>Status: ' + msg
 				}
@@ -336,11 +348,15 @@ const WebGLUtils = (function() {
 		opt_onError = opt_onError || handleCreationError
 
 		if (canvas.addEventListener) {
-			canvas.addEventListener('webglcontextcreationerror', (event: WebGLContextEvent) =>
-				opt_onError(event.statusMessage)
+			canvas.addEventListener(
+				'webglcontextcreationerror',
+				(event: WebGLContextEvent): void => opt_onError(event.statusMessage)
 			)
 		}
-		const context = create3DContext(canvas, opt_attribs)
+		const context: CanvasRenderingContext2D | WebGLRenderingContext | null = create3DContext(
+			canvas,
+			opt_attribs
+		)
 		if (!context) {
 			if (!(window as any).WebGLRenderingContext) {
 				opt_onError('')
@@ -358,9 +374,9 @@ const WebGLUtils = (function() {
 	const create3DContext = function(
 		canvas: HTMLCanvasElement,
 		opt_attribs?: object
-	): WebGLRenderingContext | CanvasRenderingContext2D {
-		const names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']
-		let context = null
+	): CanvasRenderingContext2D | WebGLRenderingContext | null {
+		const names: string[] = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']
+		let context: CanvasRenderingContext2D | WebGLRenderingContext | null = null
 		for (const name of names) {
 			try {
 				context = canvas.getContext(name, opt_attribs)

@@ -48,25 +48,26 @@ export function createProgram(
 	opt_attribs?: string[],
 	opt_locations?: number[],
 	opt_errorCallback?: any
-): WebGLProgram {
-	const errFn = opt_errorCallback || console.error
+): WebGLProgram | null {
+	const errFn: (errorMessage: string) => void | Console = opt_errorCallback || console.error
 	const program: WebGLProgram = gl.createProgram()
 
-	shaders.forEach((shader) => gl.attachShader(program, shader))
+	shaders.forEach((shader): void => gl.attachShader(program, shader))
 
 	if (opt_attribs) {
-		opt_attribs.forEach((attrib, ndx) =>
-			gl.bindAttribLocation(program, opt_locations ? opt_locations[ndx] : ndx, attrib)
+		opt_attribs.forEach(
+			(attrib, ndx): void =>
+				gl.bindAttribLocation(program, opt_locations ? opt_locations[ndx] : ndx, attrib)
 		)
 	}
 
 	gl.linkProgram(program)
 
 	// Check the link status
-	const linked = gl.getProgramParameter(program, gl.LINK_STATUS)
+	const linked: any = gl.getProgramParameter(program, gl.LINK_STATUS)
 	if (!linked) {
 		// something went wrong with the link
-		const lastError = gl.getProgramInfoLog(program)
+		const lastError: string = gl.getProgramInfoLog(program)
 		errFn('Error in program linking:' + lastError)
 
 		gl.deleteProgram(program)
@@ -104,9 +105,9 @@ export function resizeCanvasToDisplaySize(
  * @memberOf module:webgl-utils
  */
 export function resizeCanvasToSquare(canvas: HTMLCanvasElement): boolean {
-	const styles = getComputedStyle(canvas)
-	const width = parseFloat(styles.width)
-	const height = parseFloat(styles.height)
+	const styles: CSSStyleDeclaration = getComputedStyle(canvas)
+	const width: number = parseFloat(styles.width)
+	const height: number = parseFloat(styles.height)
 
 	if (canvas.width !== width || canvas.height !== height) {
 		canvas.width = width
@@ -121,8 +122,8 @@ export function createShader(
 	type: string,
 	resolve: (value: WebGLShader | PromiseLike<{}>) => void,
 	reject: (reason: Error) => void
-) {
-	function handleShader(data: string): WebGLShader {
+): void {
+	function handleShader(data: string): WebGLShader | null {
 		let shader: WebGLShader
 		if (type === 'fragment-shader') {
 			shader = gl.createShader(gl.FRAGMENT_SHADER)
@@ -139,7 +140,7 @@ export function createShader(
 	}
 
 	fetch(`http://localhost:1337/assets/shaders/${type}.glsl`)
-		.then((resp) => resp.text())
+		.then((resp: Response) => resp.text())
 		.then((data: string) => handleShader(data))
 		.then((shader: WebGLShader) => resolve(shader))
 		.catch((err: Error) => reject(err))
