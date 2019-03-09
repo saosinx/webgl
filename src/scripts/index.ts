@@ -141,9 +141,10 @@ const initVariables = function() {
 const initTextures = function() {
 	return true
 }
-// prettier-ignore
+
 const initBuffer = function(): number {
-	const vertices = new Float32Array([
+	// prettier-ignore
+	const vertices: Float32Array = new Float32Array([
 		1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 		-1.0, 1.0, 1.0, 1.0, 0.0, 1.0,
 		-1.0, -1.0, 1.0, 1.0, 0.0, 0.0,
@@ -154,7 +155,7 @@ const initBuffer = function(): number {
 		-1.0, -1.0, -1.0, 0.0, 0.0, 0.0,
 	])
 
-	const FSIZE = vertices.BYTES_PER_ELEMENT
+	const FSIZE: number = vertices.BYTES_PER_ELEMENT
 
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
@@ -166,7 +167,8 @@ const initBuffer = function(): number {
 	gl.vertexAttribPointer(attribs.aColor, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3)
 	gl.enableVertexAttribArray(attribs.aColor)
 
-	const indices = new Uint8Array([
+	// prettier-ignore
+	const indices: Uint8Array = new Uint8Array([
 		0, 1, 2, 0, 2, 3,
 		0, 3, 4, 0, 4, 5,
 		0, 5, 6, 0, 6, 1,
@@ -182,7 +184,7 @@ const initBuffer = function(): number {
 	return indices.length
 }
 
-const drawScene = function() {
+const drawScene = function(): void {
 	gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
