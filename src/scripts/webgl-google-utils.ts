@@ -58,7 +58,7 @@
  * visible.
  */
 
-export function getPositionFromMatrix(matrix: number[]) {
+export function getPositionFromMatrix(matrix: number[]): { x: number; y: number; z: number } {
 	return { x: matrix[12], y: matrix[13], z: matrix[14] }
 }
 
@@ -67,10 +67,10 @@ export function getRotationFromMatrix(matrix: number[]) {
 }
 
 export function degToRad(degrees: number | string): number {
-	return (parseFloat(<string>degrees) * Math.PI) / 180
+	return (parseFloat(degrees as string) * Math.PI) / 180
 }
 
-export function getMousePosition(event: MouseEvent) {
+export function getMousePosition(event: MouseEvent): { x: number; y: number } {
 	return { x: event.offsetX, y: event.offsetY }
 }
 
@@ -80,7 +80,7 @@ export function getNodeFromMouse(
 	gridSize: number,
 	GRID_WIDTH: number,
 	GRID_HEIGHT: number,
-) {
+): { x: number; y: number } | null {
 	// We're getting it in this format: left=0, right=gridSize. Same with top and bottom.
 	// First, let's see what the grid looks like compared to the canvas.
 	// Its borders will always be touching whichever part's thinner: the width or the height.
@@ -105,7 +105,7 @@ export function getCoordinateFromMouse(
 	gridSize: number,
 	GRID_WIDTH: number,
 	GRID_HEIGHT: number,
-) {
+): { x: number; y: number } {
 	// We're getting it in this format: left=0, right=gridSize. Same with top and bottom.
 	// First, let's see what the grid looks like compared to the canvas.
 	// Its borders will always be touching whichever part's thinner: the width or the height.
@@ -125,22 +125,30 @@ export function getCoordinateFromMouse(
  * For example, to use the texture stored at TEXTURE0, you set the sampler to 0.
  */
 
-export function addTexture(gl: WebGLRenderingContext, imageURL: string, glTexture: GLenum) {
+export function addTexture(
+	gl: WebGLRenderingContext,
+	imageURL: string,
+	glTexture: GLenum,
+): WebGLTexture {
 	function isPowerOf2(value: number): boolean {
 		if ((value & (value - 1)) === 0) {
 			return true
 		}
 	}
 
-	const texture: any = gl.createTexture()
+	interface WebGLExtendedTexture extends WebGLTexture {
+		image?: HTMLImageElement
+	}
+
+	const texture: WebGLExtendedTexture = gl.createTexture()
 	texture.image = new Image()
-	texture.image.onload = function() {
+	texture.image.onload = function(): void {
 		gl.activeTexture(glTexture)
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
 		gl.bindTexture(gl.TEXTURE_2D, texture)
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this)
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image)
 
 		// This clamps images whose dimensions are not a power of 2, letting you use images of any size.
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -151,14 +159,14 @@ export function addTexture(gl: WebGLRenderingContext, imageURL: string, glTextur
 	return texture
 }
 
-export function ease(from: number, to: number, easiness: number) {
+export function ease(from: number, to: number, easiness: number): number {
 	if (easiness > 1) {
 		easiness = 1 / easiness
 	}
 	return (to - from) * easiness
 }
 
-export function displayAlertMatrix(matrix: number[]) {
+export function displayAlertMatrix(matrix: number[]): void {
 	let testString = ''
 	for (let i = 0, l = matrix.length; i < l; i++) {
 		if (i % 4 === 0 && i > 0) {
@@ -170,7 +178,7 @@ export function displayAlertMatrix(matrix: number[]) {
 	alert(testString)
 }
 
-export function addVectors(vec1: number[], vec2: number[]) {
+export function addVectors(vec1: number[], vec2: number[]): number[] {
 	for (let i = 0, l = vec1.length; i < l; i++) {
 		if (vec2[i]) {
 			vec1[i] += vec2[i]
@@ -178,7 +186,7 @@ export function addVectors(vec1: number[], vec2: number[]) {
 	}
 	return vec1
 }
-export function subtractVectors(vec1: number[], vec2: number[]) {
+export function subtractVectors(vec1: number[], vec2: number[]): number[] {
 	for (let i = 0, l = vec1.length; i < l; i++) {
 		if (vec2[i]) {
 			vec1[i] -= vec2[i]
@@ -187,14 +195,14 @@ export function subtractVectors(vec1: number[], vec2: number[]) {
 	return vec1
 }
 
-export function inverseVector(vec: number[]) {
+export function inverseVector(vec: number[]): number[] {
 	for (let i = 0, l = vec.length; i < l; i++) {
 		vec[i] = 1 - Math.abs(vec[i])
 	}
 	return vec
 }
 
-export function alertMat4(mat: number[]) {
+export function alertMat4(mat: number[]): void {
 	let string = '['
 
 	for (let i = 0; i < 4; i++) {
@@ -207,7 +215,7 @@ export function alertMat4(mat: number[]) {
 	alert(string)
 }
 
-export function Float32Concat(original: number[], addition: number[]) {
+export function Float32Concat(original: number[], addition: number[]): Float32Array | number[] {
 	if (!original) {
 		return addition
 	}
@@ -225,20 +233,20 @@ export function Float32Concat(original: number[], addition: number[]) {
 
 let totalTimePassed = 0
 let lastTimePassed = 0
-export function ConsoleTimePassed(message: string) {
+export function ConsoleTimePassed(message: string): void {
 	totalTimePassed = new Date().getTime()
 	console.log(message + ': ' + (totalTimePassed - lastTimePassed))
 	lastTimePassed = totalTimePassed
 }
 
-export function easeNormalVec(vec: number[]) {
+export function easeNormalVec(vec: number[]): number[] {
 	vec[0] += (1 - vec[0]) / 2
 	vec[1] += (1 - vec[1]) / 2
 	vec[2] += (1 - vec[2]) / 2
 
 	return vec
 }
-export function getBetweenVec(min: number[], range: number[]) {
+export function getBetweenVec(min: number[], range: number[]): number[] {
 	const vec: number[] = [0, 0, 0]
 	vec[0] = Math.random() * range[0] + min[0]
 	vec[1] = Math.random() * range[1] + min[1]
@@ -247,7 +255,7 @@ export function getBetweenVec(min: number[], range: number[]) {
 	return vec
 }
 
-export function normalize(vec: number[]) {
+export function normalize(vec: number[]): number[] {
 	let i = 0
 	let total = 0
 	const l = vec.length
@@ -376,7 +384,7 @@ window.requestAnimationFrame = (function() {
 		(<any>window).mozRequestAnimationFrame ||
 		(<any>window).oRequestAnimationFrame ||
 		(<any>window).msRequestAnimationFrame ||
-		function(callback: () => void) {
+		function(callback: () => void): void {
 			window.setTimeout(callback, 1000 / 15)
 		}
 	)
