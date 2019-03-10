@@ -2,9 +2,9 @@
 @fileoverview gl-matrix - High performance matrix and vector operations
 @author Brandon Jones
 @author Colin MacKenzie IV
-@version 3.0.0-0
+@version 3.0.0
 
-Copyright (c) 2015-2018, Brandon Jones, Colin MacKenzie IV.
+Copyright (c) 2015-2019, Brandon Jones, Colin MacKenzie IV.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -925,7 +925,7 @@ THE SOFTWARE.
 				Math.pow(a[3], 2) +
 				Math.pow(a[4], 2) +
 				Math.pow(a[5], 2) +
-				1,
+				1
 		)
 	}
 	/**
@@ -1759,7 +1759,7 @@ THE SOFTWARE.
 				Math.pow(a[5], 2) +
 				Math.pow(a[6], 2) +
 				Math.pow(a[7], 2) +
-				Math.pow(a[8], 2),
+				Math.pow(a[8], 2)
 		)
 	}
 	/**
@@ -2082,7 +2082,7 @@ THE SOFTWARE.
 		m30,
 		m31,
 		m32,
-		m33,
+		m33
 	) {
 		var out = new ARRAY_TYPE(16)
 		out[0] = m00
@@ -2143,7 +2143,7 @@ THE SOFTWARE.
 		m30,
 		m31,
 		m32,
-		m33,
+		m33
 	) {
 		out[0] = m00
 		out[1] = m01
@@ -3700,7 +3700,7 @@ THE SOFTWARE.
 				Math.pow(a[12], 2) +
 				Math.pow(a[13], 2) +
 				Math.pow(a[14], 2) +
-				Math.pow(a[15], 2),
+				Math.pow(a[15], 2)
 		)
 	}
 	/**
@@ -4618,6 +4618,19 @@ THE SOFTWARE.
 		}
 	}
 	/**
+	 * Set the components of a vec3 to zero
+	 *
+	 * @param {vec3} out the receiving vector
+	 * @returns {vec3} out
+	 */
+
+	function zero(out) {
+		out[0] = 0.0
+		out[1] = 0.0
+		out[2] = 0.0
+		return out
+	}
+	/**
 	 * Returns a string representation of a vector
 	 *
 	 * @param {vec3} a vector to represent as a string
@@ -4784,6 +4797,7 @@ THE SOFTWARE.
 		rotateY: rotateY$1,
 		rotateZ: rotateZ$1,
 		angle: angle,
+		zero: zero,
 		str: str$4,
 		exactEquals: exactEquals$4,
 		equals: equals$5,
@@ -5185,6 +5199,33 @@ THE SOFTWARE.
 		return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
 	}
 	/**
+	 * Returns the cross-product of three vectors in a 4-dimensional space
+	 *
+	 * @param {vec4} result the receiving vector
+	 * @param {vec4} U the first vector
+	 * @param {vec4} V the second vector
+	 * @param {vec4} W the third vector
+	 * @returns {vec4} result
+	 */
+
+	function cross$1(out, u, v, w) {
+		var A = v[0] * w[1] - v[1] * w[0],
+			B = v[0] * w[2] - v[2] * w[0],
+			C = v[0] * w[3] - v[3] * w[0],
+			D = v[1] * w[2] - v[2] * w[1],
+			E = v[1] * w[3] - v[3] * w[1],
+			F = v[2] * w[3] - v[3] * w[2]
+		var G = u[0]
+		var H = u[1]
+		var I = u[2]
+		var J = u[3]
+		out[0] = H * F - I * E + J * D
+		out[1] = -(G * F) + I * C - J * B
+		out[2] = G * E - H * C + J * A
+		out[3] = -(G * D) + H * B - I * A
+		return out
+	}
+	/**
 	 * Performs a linear interpolation between two vec4's
 	 *
 	 * @param {vec4} out the receiving vector
@@ -5287,6 +5328,20 @@ THE SOFTWARE.
 		out[1] = iy * qw + iw * -qy + iz * -qx - ix * -qz
 		out[2] = iz * qw + iw * -qz + ix * -qy - iy * -qx
 		out[3] = a[3]
+		return out
+	}
+	/**
+	 * Set the components of a vec4 to zero
+	 *
+	 * @param {vec4} out the receiving vector
+	 * @returns {vec4} out
+	 */
+
+	function zero$1(out) {
+		out[0] = 0.0
+		out[1] = 0.0
+		out[2] = 0.0
+		out[3] = 0.0
 		return out
 	}
 	/**
@@ -5449,10 +5504,12 @@ THE SOFTWARE.
 		inverse: inverse$1,
 		normalize: normalize$1,
 		dot: dot$1,
+		cross: cross$1,
 		lerp: lerp$1,
 		random: random$1,
 		transformMat4: transformMat4$1,
 		transformQuat: transformQuat$1,
+		zero: zero$1,
 		str: str$5,
 		exactEquals: exactEquals$5,
 		equals: equals$6,
@@ -7400,7 +7457,7 @@ THE SOFTWARE.
 	 * @returns {vec3} out
 	 */
 
-	function cross$1(out, a, b) {
+	function cross$2(out, a, b) {
 		var z = a[0] * b[1] - a[1] * b[0]
 		out[0] = out[1] = 0
 		out[2] = z
@@ -7562,6 +7619,18 @@ THE SOFTWARE.
 		}
 	}
 	/**
+	 * Set the components of a vec2 to zero
+	 *
+	 * @param {vec2} out the receiving vector
+	 * @returns {vec2} out
+	 */
+
+	function zero$2(out) {
+		out[0] = 0.0
+		out[1] = 0.0
+		return out
+	}
+	/**
 	 * Returns a string representation of a vector
 	 *
 	 * @param {vec2} a vector to represent as a string
@@ -7711,7 +7780,7 @@ THE SOFTWARE.
 		inverse: inverse$2,
 		normalize: normalize$4,
 		dot: dot$4,
-		cross: cross$1,
+		cross: cross$2,
 		lerp: lerp$4,
 		random: random$3,
 		transformMat2: transformMat2,
@@ -7720,6 +7789,7 @@ THE SOFTWARE.
 		transformMat4: transformMat4$2,
 		rotate: rotate$4,
 		angle: angle$1,
+		zero: zero$2,
 		str: str$8,
 		exactEquals: exactEquals$8,
 		equals: equals$9,

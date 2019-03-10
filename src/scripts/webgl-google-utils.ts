@@ -85,9 +85,9 @@ export function getNodeFromMouse(
 	// First, let's see what the grid looks like compared to the canvas.
 	// Its borders will always be touching whichever part's thinner: the width or the height.
 
-	const middleCanvas = { x: canvas.width / 2, y: canvas.height / 2 }
+	const middleCanvas: { x: number; y: number } = { x: canvas.width / 2, y: canvas.height / 2 }
 
-	const pos = {
+	const pos: { x: number; y: number } = {
 		x: (gridSize * (mouse.x - (middleCanvas.x - GRID_WIDTH * 0.5))) / GRID_WIDTH,
 		y: (gridSize * (mouse.y - (middleCanvas.y - GRID_HEIGHT * 0.5))) / GRID_HEIGHT,
 	}
@@ -110,9 +110,9 @@ export function getCoordinateFromMouse(
 	// First, let's see what the grid looks like compared to the canvas.
 	// Its borders will always be touching whichever part's thinner: the width or the height.
 
-	const middleCanvas = { x: canvas.width, y: canvas.height }
+	const middleCanvas: { x: number; y: number } = { x: canvas.width, y: canvas.height }
 
-	const pos = {
+	const pos: { x: number; y: number } = {
 		x: (gridSize * (mouse.x - (middleCanvas.x - GRID_WIDTH * 0.5))) / GRID_WIDTH,
 		y: (gridSize * (mouse.y - (middleCanvas.y - GRID_HEIGHT * 0.5))) / GRID_HEIGHT,
 	}

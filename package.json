@@ -1,8 +1,7 @@
 {
   "name": "webgl",
   "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.ts",
+  "main": "gulpfile.js",
   "scripts": {
     "start": "gulp clean|gulp default",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -31,5 +30,16 @@
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bezier-easing": "^2.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saosinx/webgl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/saosinx/webgl/issues"
+  },
+  "homepage": "https://github.com/saosinx/webgl#readme",
+  "description": ""
 }

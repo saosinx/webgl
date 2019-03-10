@@ -1,8 +1,13 @@
+import bezier from './bezier-easing'
 import WebGLUtils, { addTexture, degToRad } from './webgl-google-utils'
 import { mat4, vec3 } from './webgl-matrix'
 import { createProgram, createShader, resizeCanvasToDisplaySize } from './webgl-utils'
 
-let gl: any
+interface IWebGLRenderingContextExtended extends WebGLRenderingContext {
+	program: WebGLProgram
+}
+
+let gl: IWebGLRenderingContextExtended
 
 const attribs: any = {}
 const uniforms: any = {}
@@ -11,10 +16,13 @@ const viewMatrix = mat4.identity(mat4.create())
 const modelMatrix = mat4.identity(mat4.create())
 const modelViewMatrix = mat4.identity(mat4.create())
 const perspectiveMatrix = mat4.identity(mat4.create())
-const mvpMatrix = mat4.identity(mat4.create())
+const mvpMatrix: any = mat4.identity(mat4.create())
 mat4.perspective(perspectiveMatrix, degToRad(60), 1, 1, 100)
 
-const $ = function(selector: string, qs?: boolean): HTMLElement {
+const lightDirection: any = vec3.fromValues(0.5, 3.0, 4.0)
+vec3.normalize(lightDirection, lightDirection)
+
+const $ = function(selector: string, qs?: boolean): HTMLElement | SVGElement {
 	if (!qs) return document.getElementById(selector)
 	return document.querySelector(selector)
 }
@@ -131,11 +139,14 @@ const initShaders = function(resolve: () => void, reject: (err: Error) => void) 
 
 const initVariables = function() {
 	attribs.aPosition = gl.getAttribLocation(gl.program, 'a_Position')
+	attribs.aNormal = gl.getAttribLocation(gl.program, 'a_Normal')
 	attribs.aColor = gl.getAttribLocation(gl.program, 'a_Color')
 
-	uniforms.uWidth = gl.getUniformLocation(gl.program, 'u_Width')
-	uniforms.uHeight = gl.getUniformLocation(gl.program, 'u_Height')
 	uniforms.uMvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
+	uniforms.uLightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
+	uniforms.uLightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection')
+	uniforms.uHeight = gl.getUniformLocation(gl.program, 'u_Height')
+	uniforms.uWidth = gl.getUniformLocation(gl.program, 'u_Width')
 }
 
 const initTextures = function() {
@@ -145,36 +156,63 @@ const initTextures = function() {
 const initBuffer = function(): number {
 	// prettier-ignore
 	const vertices: Float32Array = new Float32Array([
-		1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-		-1.0, 1.0, 1.0, 1.0, 0.0, 1.0,
-		-1.0, -1.0, 1.0, 1.0, 0.0, 0.0,
-		1.0, -1.0, 1.0, 1.0, 1.0, 0.0,
-		1.0, -1.0, -1.0, 0.0, 1.0, 0.0,
-		1.0, 1.0, -1.0, 0.0, 1.0, 1.0,
-		-1.0, 1.0, -1.0, 0.0, 0.0, 1.0,
-		-1.0, -1.0, -1.0, 0.0, 0.0, 0.0,
+		1.0, 1.0, 1.0,    -1.0, 1.0, 1.0,    -1.0, -1.0, 1.0,   1.0, -1.0, 1.0,
+		1.0, 1.0, 1.0,     1.0, -1.0, 1.0,    1.0, -1.0, -1.0,  1.0, 1.0, -1.0,
+		1.0, 1.0, 1.0,     1.0, 1.0, -1.0,   -1.0, 1.0, -1.0,  -1.0, 1.0, 1.0,
+		-1.0, -1.0, 1.0,  -1.0, 1.0, 1.0,    -1.0, 1.0, -1.0,  -1.0, -1.0, -1.0,
+		-1.0, -1.0, 1.0,  -1.0, -1.0, -1.0,   1.0, -1.0, -1.0,  1.0, -1.0, 1.0,
+		1.0, -1.0, -1.0,  -1.0, -1.0, -1.0,  -1.0, 1.0, -1.0,   1.0, 1.0, -1.0,
 	])
-
-	const FSIZE: number = vertices.BYTES_PER_ELEMENT
 
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
 	gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
 
-	gl.vertexAttribPointer(attribs.aPosition, 3, gl.FLOAT, false, FSIZE * 6, 0)
+	gl.vertexAttribPointer(attribs.aPosition, 3, gl.FLOAT, false, 0, 0)
 	gl.enableVertexAttribArray(attribs.aPosition)
 
-	gl.vertexAttribPointer(attribs.aColor, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3)
+	// prettier-ignore
+	const colors: Float32Array = new Float32Array([
+		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+	])
+
+	const colorsBuffer: WebGLBuffer = gl.createBuffer()
+	gl.bindBuffer(gl.ARRAY_BUFFER, colorsBuffer)
+	gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
+
+	gl.vertexAttribPointer(attribs.aColor, 3, gl.FLOAT, false, 0, 0)
 	gl.enableVertexAttribArray(attribs.aColor)
 
 	// prettier-ignore
+	const normals: Float32Array = new Float32Array([
+		0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0, 	 0.0, 0.0, 1.0,
+		1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0, 	 1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0, 	 0.0, 1.0, 0.0,
+		-1.0, 0.0, 0.0, -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,
+		0.0, -1.0, 0.0,  0.0, -1.0, 0.0,  0.0, -1.0, 0.0,  0.0, -1.0, 0.0,
+		0.0, 0.0, -1.0,  0.0, 0.0, -1.0,  0.0, 0.0, -1.0,  0.0, 0.0, -1.0,
+	])
+
+	const normalsBuffer: WebGLBuffer = gl.createBuffer()
+	gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer)
+	gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW)
+
+	gl.vertexAttribPointer(attribs.aNormal, 3, gl.FLOAT, false, 0, 0)
+	gl.enableVertexAttribArray(attribs.aNormal)
+
+	// prettier-ignore
 	const indices: Uint8Array = new Uint8Array([
-		0, 1, 2, 0, 2, 3,
-		0, 3, 4, 0, 4, 5,
-		0, 5, 6, 0, 6, 1,
-		1, 6, 7, 1, 7, 2,
-		7, 4, 3, 7, 3, 2,
-		4, 7, 6, 4, 6, 5,
+		0, 1, 2,    0, 2, 3,
+		4, 5, 6,    4, 6, 7,
+		8, 9, 10,   8, 10, 11,
+		12, 13, 14, 12, 14, 15,
+		16, 17, 18, 16, 18, 19,
+		20, 21, 22, 20, 22, 23,
 	])
 
 	const indexBuffer: WebGLBuffer = gl.createBuffer()
@@ -217,6 +255,8 @@ const drawScene = function(): void {
 	mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix)
 
 	gl.uniformMatrix4fv(uniforms.uMvpMatrix, false, mvpMatrix)
+	gl.uniform3f(uniforms.uLightColor, 1.0, 1.0, 1.0)
+	gl.uniform3fv(uniforms.uLightDirection, lightDirection)
 
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
@@ -237,36 +277,47 @@ const render = function(time: DOMHighResTimeStamp = 0) {
 	drawScene()
 }
 
-const webGLStart = function() {
-	const canvas: any = document.getElementById('canvas')
+const webGLStart = function(): void {
+	const canvas: HTMLCanvasElement = $('canvas') as HTMLCanvasElement
 
-	const powerPreference = 'default' || 'high-performance' || 'low-power'
+	const powerPreference: string = 'default' || 'high-performance' || 'low-power'
 	gl = WebGLUtils.setupWebGL(canvas, {
 		alpha: true,
 		depth: true,
 		powerPreference,
-	})
+	}) as IWebGLRenderingContextExtended
 
 	gl.clearColor(0.0, 0.0, 0.0, 1.0)
 	gl.enable(gl.DEPTH_TEST)
 
 	resizeCanvasToDisplaySize(gl.canvas)
 
-	const promiseShader = new Promise((res, rej) => initShaders(res, rej))
+	const promiseShader: Promise<{}> = new Promise((res, rej) => initShaders(res, rej))
 	promiseShader
 		.then(() => initVariables())
 		.then(() => initTextures())
 		.then(() => initBuffer())
-		.then((indices) => render())
+		.then((indices: number) => render())
 		.catch((error: Error) => console.error(error))
 }
 
-const updateInfobar = function(elem: HTMLElement) {
+// TODO Smooth animation
+// const animate = function(duration: number, from: number, to: number): void {
+// 	const easing = bezier(0.215, 0.61, 0.355, 1.0)
+// 	const iterations: number = 60 / (duration / 1000)
+// 	const step: number = 1 / iterations
+
+// 	for (let i: number = 0; i <= iterations; i += 1) {
+// 		(to - from) * easing(step * i) + from
+// 	}
+// }
+
+const updateInfobar = function(elem: HTMLElement): void {
 	elem.innerHTML = scene[elem.id].value.toFixed(2)
 }
 
 const setCanvasControls = function(): void {
-	let isRotatable = false
+	let isRotatable: boolean = false
 
 	gl.canvas.addEventListener('mousedown', (e: MouseEvent) => (isRotatable = true))
 	gl.canvas.addEventListener('mouseup', (e: MouseEvent) => (isRotatable = false))
@@ -291,14 +342,14 @@ const setCanvasControls = function(): void {
 	})
 
 	gl.canvas.addEventListener('wheel', (e: WheelEvent) => {
-		let direction = e.deltaY < 0 ? -0.15 : 0.15
+		let direction: number = e.deltaY < 0 ? -0.15 : 0.15
 		if (e.shiftKey) direction *= 3
 		scene.cameraZ.value += direction
 		updateInfobar(scene.cameraZ.elem)
 	})
 }
 
-window.onload = function() {
+window.onload = function(): void {
 	for (const key in scene) {
 		if (scene.hasOwnProperty(key)) {
 			scene[key].value = +parseFloat(scene[key].elem.innerHTML)
