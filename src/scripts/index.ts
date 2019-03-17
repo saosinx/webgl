@@ -12,15 +12,16 @@ let gl: IWebGLRenderingContextExtended
 const attribs: any = {}
 const uniforms: any = {}
 
-const viewMatrix = mat4.identity(mat4.create())
-const modelMatrix = mat4.identity(mat4.create())
-const modelViewMatrix = mat4.identity(mat4.create())
-const perspectiveMatrix = mat4.identity(mat4.create())
+const viewMatrix: any = mat4.identity(mat4.create())
+const modelMatrix: any = mat4.identity(mat4.create())
+const normalMatrix: any = mat4.identity(mat4.create())
+const modelViewMatrix: any = mat4.identity(mat4.create())
+const perspectiveMatrix: any = mat4.identity(mat4.create())
 const mvpMatrix: any = mat4.identity(mat4.create())
 mat4.perspective(perspectiveMatrix, degToRad(60), 1, 1, 100)
 
-const lightDirection: any = vec3.fromValues(0.5, 3.0, 4.0)
-vec3.normalize(lightDirection, lightDirection)
+// const lightPosition: any = vec3.fromValues(-3.0, -4.0, -4.0)
+// vec3.normalize(lightPosition, lightPosition)
 
 const $ = function(selector: string, qs?: boolean): HTMLElement | SVGElement {
 	if (!qs) return document.getElementById(selector)
@@ -143,8 +144,11 @@ const initVariables = function() {
 	attribs.aColor = gl.getAttribLocation(gl.program, 'a_Color')
 
 	uniforms.uMvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
+	uniforms.uModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
+	uniforms.uNormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
 	uniforms.uLightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
-	uniforms.uLightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection')
+	uniforms.uLightPosition = gl.getUniformLocation(gl.program, 'u_LightPosition')
+	uniforms.uAmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
 	uniforms.uHeight = gl.getUniformLocation(gl.program, 'u_Height')
 	uniforms.uWidth = gl.getUniformLocation(gl.program, 'u_Width')
 }
@@ -254,9 +258,16 @@ const drawScene = function(): void {
 	mat4.mul(modelViewMatrix, viewMatrix, modelMatrix)
 	mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix)
 
+	mat4.invert(normalMatrix, modelMatrix)
+	mat4.transpose(normalMatrix, normalMatrix)
+
 	gl.uniformMatrix4fv(uniforms.uMvpMatrix, false, mvpMatrix)
+	gl.uniformMatrix4fv(uniforms.uModelMatrix, false, modelMatrix)
+	gl.uniformMatrix4fv(uniforms.uNormalMatrix, false, normalMatrix)
+
+	gl.uniform3f(uniforms.ulightPosition, 0.0, 0.0, 0.0)
 	gl.uniform3f(uniforms.uLightColor, 1.0, 1.0, 1.0)
-	gl.uniform3fv(uniforms.uLightDirection, lightDirection)
+	gl.uniform3f(uniforms.uAmbientLight, 0.2, 0.2, 0.2)
 
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
