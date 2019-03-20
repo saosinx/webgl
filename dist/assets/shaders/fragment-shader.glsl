@@ -12,9 +12,9 @@ void main(void) {
 	vec3 normal = normalize(v_Normal);
 	vec3 lightDirection = normalize(u_LightPosition - v_Position);
 
-	float angleLightNormal = max(dot(lightDirection, normal), 0.0);
+	float dotLN = max(dot(lightDirection, normal), 0.0);
 
-	vec3 diffuse = u_LightColor * v_Color.rgb * angleLightNormal;
+	vec3 diffuse = u_LightColor * v_Color.rgb * dotLN;
 	vec3 ambient = u_AmbientLight * v_Color.rgb;
 
 	gl_FragColor = vec4(diffuse + ambient, v_Color.a);

@@ -20,55 +20,12 @@ const perspectiveMatrix: any = mat4.identity(mat4.create())
 const mvpMatrix: any = mat4.identity(mat4.create())
 mat4.perspective(perspectiveMatrix, degToRad(60), 1, 1, 100)
 
-// const lightPosition: any = vec3.fromValues(-3.0, -4.0, -4.0)
-// vec3.normalize(lightPosition, lightPosition)
-
 const $ = function(selector: string, qs?: boolean): HTMLElement | SVGElement {
 	if (!qs) return document.getElementById(selector)
 	return document.querySelector(selector)
 }
 
 interface IScene {
-	modelScale: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	modelRotateX: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	modelRotateY: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	modelRotateZ: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	modelTranslateX: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	modelTranslateY: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	modelTranslateZ: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	cameraX: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	cameraY: {
-		readonly elem: HTMLElement
-		value: number
-	}
-	cameraZ: {
-		readonly elem: HTMLElement
-		value: number
-	}
 	[key: string]: {
 		readonly elem: HTMLElement
 		value: number
