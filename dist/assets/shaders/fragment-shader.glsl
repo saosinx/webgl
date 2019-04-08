@@ -1,21 +1,7 @@
 precision mediump float;
 
-uniform vec3 u_LightColor;
-uniform vec3 u_LightPosition;
-uniform vec3 u_AmbientLight;
-
-varying vec3 v_Normal;
-varying vec3 v_Position;
-varying vec4 v_Color;
+varying vec3 v_Color;
 
 void main(void) {
-	vec3 normal = normalize(v_Normal);
-	vec3 lightDirection = normalize(u_LightPosition - v_Position);
-
-	float dotLN = max(dot(lightDirection, normal), 0.0);
-
-	vec3 diffuse = u_LightColor * v_Color.rgb * dotLN;
-	vec3 ambient = u_AmbientLight * v_Color.rgb;
-
-	gl_FragColor = vec4(diffuse + ambient, v_Color.a);
+	gl_FragColor = vec4(v_Color, 1.0);
 }

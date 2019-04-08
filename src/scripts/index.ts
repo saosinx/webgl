@@ -12,13 +12,28 @@ let gl: IWebGLRenderingContextExtended
 const attribs: any = {}
 const uniforms: any = {}
 
+let arraysToDraw: number = 0
+
 const viewMatrix: any = mat4.identity(mat4.create())
 const modelMatrix: any = mat4.identity(mat4.create())
-const normalMatrix: any = mat4.identity(mat4.create())
 const modelViewMatrix: any = mat4.identity(mat4.create())
 const perspectiveMatrix: any = mat4.identity(mat4.create())
 const mvpMatrix: any = mat4.identity(mat4.create())
-mat4.perspective(perspectiveMatrix, degToRad(60), 1, 1, 100)
+mat4.perspective(perspectiveMatrix, degToRad(60), 1, 0.1, 100)
+
+const generateCircleVertices = function(radius: number, accuracy: number): number[] {
+	const angle = (360 / accuracy) * (Math.PI / 180)
+	const vertices = []
+
+	for (let i = 0; i < accuracy; i += 1) {
+		const x = radius * +Math.cos(angle * i).toFixed(3)
+		const y = radius * +Math.sin(angle * i).toFixed(3)
+
+		vertices.push(x, y)
+	}
+
+	return vertices
+}
 
 const $ = function(selector: string, qs?: boolean): HTMLElement | SVGElement {
 	if (!qs) return document.getElementById(selector)
@@ -33,10 +48,6 @@ interface IScene {
 }
 
 const scene: IScene = {
-	modelScale: {
-		elem: $('modelScale') as HTMLElement,
-		value: 0,
-	},
 	modelRotateX: {
 		elem: $('modelRotateX') as HTMLElement,
 		value: 0,
@@ -97,15 +108,9 @@ const initShaders = function(resolve: () => void, reject: (err: Error) => void) 
 
 const initVariables = function() {
 	attribs.aPosition = gl.getAttribLocation(gl.program, 'a_Position')
-	attribs.aNormal = gl.getAttribLocation(gl.program, 'a_Normal')
-	attribs.aColor = gl.getAttribLocation(gl.program, 'a_Color')
 
 	uniforms.uMvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
 	uniforms.uModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
-	uniforms.uNormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
-	uniforms.uLightColor = gl.getUniformLocation(gl.program, 'u_LightColor')
-	uniforms.uLightPosition = gl.getUniformLocation(gl.program, 'u_LightPosition')
-	uniforms.uAmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight')
 	uniforms.uHeight = gl.getUniformLocation(gl.program, 'u_Height')
 	uniforms.uWidth = gl.getUniformLocation(gl.program, 'u_Width')
 }
@@ -114,73 +119,18 @@ const initTextures = function() {
 	return true
 }
 
-const initBuffer = function(): number {
+const initBuffer = function(): void {
 	// prettier-ignore
-	const vertices: Float32Array = new Float32Array([
-		1.0, 1.0, 1.0,    -1.0, 1.0, 1.0,    -1.0, -1.0, 1.0,   1.0, -1.0, 1.0,
-		1.0, 1.0, 1.0,     1.0, -1.0, 1.0,    1.0, -1.0, -1.0,  1.0, 1.0, -1.0,
-		1.0, 1.0, 1.0,     1.0, 1.0, -1.0,   -1.0, 1.0, -1.0,  -1.0, 1.0, 1.0,
-		-1.0, -1.0, 1.0,  -1.0, 1.0, 1.0,    -1.0, 1.0, -1.0,  -1.0, -1.0, -1.0,
-		-1.0, -1.0, 1.0,  -1.0, -1.0, -1.0,   1.0, -1.0, -1.0,  1.0, -1.0, 1.0,
-		1.0, -1.0, -1.0,  -1.0, -1.0, -1.0,  -1.0, 1.0, -1.0,   1.0, 1.0, -1.0,
-	])
+	const vertices: Float32Array = new Float32Array([...generateCircleVertices(1, 10000)])
 
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
 	gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
 
-	gl.vertexAttribPointer(attribs.aPosition, 3, gl.FLOAT, false, 0, 0)
+	gl.vertexAttribPointer(attribs.aPosition, 2, gl.FLOAT, false, 0, 0)
 	gl.enableVertexAttribArray(attribs.aPosition)
 
-	// prettier-ignore
-	const colors: Float32Array = new Float32Array([
-		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-	])
-
-	const colorsBuffer: WebGLBuffer = gl.createBuffer()
-	gl.bindBuffer(gl.ARRAY_BUFFER, colorsBuffer)
-	gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
-
-	gl.vertexAttribPointer(attribs.aColor, 3, gl.FLOAT, false, 0, 0)
-	gl.enableVertexAttribArray(attribs.aColor)
-
-	// prettier-ignore
-	const normals: Float32Array = new Float32Array([
-		0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0, 	 0.0, 0.0, 1.0,
-		1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0, 	 1.0, 0.0, 0.0,
-		0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0, 	 0.0, 1.0, 0.0,
-		-1.0, 0.0, 0.0, -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,
-		0.0, -1.0, 0.0,  0.0, -1.0, 0.0,  0.0, -1.0, 0.0,  0.0, -1.0, 0.0,
-		0.0, 0.0, -1.0,  0.0, 0.0, -1.0,  0.0, 0.0, -1.0,  0.0, 0.0, -1.0,
-	])
-
-	const normalsBuffer: WebGLBuffer = gl.createBuffer()
-	gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer)
-	gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW)
-
-	gl.vertexAttribPointer(attribs.aNormal, 3, gl.FLOAT, false, 0, 0)
-	gl.enableVertexAttribArray(attribs.aNormal)
-
-	// prettier-ignore
-	const indices: Uint8Array = new Uint8Array([
-		0, 1, 2,    0, 2, 3,
-		4, 5, 6,    4, 6, 7,
-		8, 9, 10,   8, 10, 11,
-		12, 13, 14, 12, 14, 15,
-		16, 17, 18, 16, 18, 19,
-		20, 21, 22, 20, 22, 23,
-	])
-
-	const indexBuffer: WebGLBuffer = gl.createBuffer()
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW)
-
-	return indices.length
+	arraysToDraw = vertices.length / 2
 }
 
 const drawScene = function(): void {
@@ -207,29 +157,17 @@ const drawScene = function(): void {
 	mat4.rotateX(modelMatrix, modelMatrix, degToRad(scene.modelRotateX.value))
 	mat4.rotateY(modelMatrix, modelMatrix, degToRad(scene.modelRotateY.value))
 	mat4.rotateZ(modelMatrix, modelMatrix, degToRad(scene.modelRotateZ.value))
-	mat4.scale(
-		modelMatrix,
-		modelMatrix,
-		vec3.fromValues(scene.modelScale.value, scene.modelScale.value, scene.modelScale.value)
-	)
+
 	mat4.mul(modelViewMatrix, viewMatrix, modelMatrix)
 	mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix)
 
-	mat4.invert(normalMatrix, modelMatrix)
-	mat4.transpose(normalMatrix, normalMatrix)
-
 	gl.uniformMatrix4fv(uniforms.uMvpMatrix, false, mvpMatrix)
 	gl.uniformMatrix4fv(uniforms.uModelMatrix, false, modelMatrix)
-	gl.uniformMatrix4fv(uniforms.uNormalMatrix, false, normalMatrix)
-
-	gl.uniform3f(uniforms.ulightPosition, 0.0, 0.0, 0.0)
-	gl.uniform3f(uniforms.uLightColor, 1.0, 1.0, 1.0)
-	gl.uniform3f(uniforms.uAmbientLight, 0.2, 0.2, 0.2)
 
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
 
-	gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_BYTE, 0)
+	gl.drawArrays(gl.TRIANGLE_FAN, 0, arraysToDraw)
 }
 
 let lastTime: number = 0
@@ -265,7 +203,7 @@ const webGLStart = function(): void {
 		.then(() => initVariables())
 		.then(() => initTextures())
 		.then(() => initBuffer())
-		.then((indices: number) => render())
+		.then(() => render())
 		.catch((error: Error) => console.error(error))
 }
 
