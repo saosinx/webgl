@@ -26,10 +26,76 @@ const generateCircleVertices = function(radius: number, accuracy: number): numbe
 	const vertices = []
 
 	for (let i = 0; i < accuracy; i += 1) {
-		const x = radius * +Math.cos(angle * i).toFixed(3)
-		const y = radius * +Math.sin(angle * i).toFixed(3)
+		const x = radius * Math.cos(angle * i)
+		const y = radius * Math.sin(angle * i)
 
 		vertices.push(x, y)
+	}
+
+	return vertices
+}
+
+const generateSphereVertices = function(radius: number, accuracy: number): number[] {
+	const n = accuracy
+	const vertices = []
+
+	function getCoords(alpha: number, phi: number): number[] {
+		const coords: number[] = []
+
+		const x = radius * Math.cos(phi) * Math.sin(alpha)
+		const y = radius * Math.cos(alpha)
+		const z = -1 * +(Math.sin(phi) * Math.sin(alpha))
+		coords.push(x, y, z)
+
+		return coords
+	}
+
+	function getTriangle(
+		alpha1: number,
+		alpha2: number,
+		phi1: number,
+		phi2: number,
+		left: boolean = false
+	): number[] {
+		const triangle: number[] = []
+		let a: number[]
+		let b: number[]
+		let c: number[]
+
+		if (left) {
+			a = getCoords(alpha1, phi2)
+			b = getCoords(alpha2, phi1)
+			c = getCoords(alpha1, phi1)
+		} else {
+			a = getCoords(alpha1, phi2)
+			b = getCoords(alpha2, phi2)
+			c = getCoords(alpha2, phi1)
+		}
+
+		triangle.push(...a, ...b, ...c)
+
+		return triangle
+	}
+
+	for (let j = 0; j < n; j += 1) {
+		const phi1 = (2 * Math.PI * j) / n
+		const phi2 = (2 * Math.PI * (j + 1)) / n
+
+		for (let i = 0; i < n; i += 1) {
+			const alpha1 = (Math.PI * i) / n
+			const alpha2 = (Math.PI * (i + 1)) / n
+
+			if (i === 0) {
+				vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2))
+				continue
+			} else if (i === n - 1) {
+				vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2, true))
+				continue
+			}
+
+			vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2, true))
+			vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2))
+		}
 	}
 
 	return vertices
@@ -120,17 +186,16 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	// prettier-ignore
-	const vertices: Float32Array = new Float32Array([...generateCircleVertices(1, 10000)])
+	const vertices: Float32Array = new Float32Array([...generateSphereVertices(1, 100)])
 
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
 	gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
 
-	gl.vertexAttribPointer(attribs.aPosition, 2, gl.FLOAT, false, 0, 0)
+	gl.vertexAttribPointer(attribs.aPosition, 3, gl.FLOAT, false, 0, 0)
 	gl.enableVertexAttribArray(attribs.aPosition)
 
-	arraysToDraw = vertices.length / 2
+	arraysToDraw = vertices.length / 3
 }
 
 const drawScene = function(): void {
@@ -167,7 +232,7 @@ const drawScene = function(): void {
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
 
-	gl.drawArrays(gl.TRIANGLE_FAN, 0, arraysToDraw)
+	gl.drawArrays(gl.TRIANGLES, 0, arraysToDraw)
 }
 
 let lastTime: number = 0
