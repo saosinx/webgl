@@ -23,6 +23,7 @@ const modelMatrix: any = mat4.identity(mat4.create())
 const modelViewMatrix: any = mat4.identity(mat4.create())
 const perspectiveMatrix: any = mat4.identity(mat4.create())
 const mvpMatrix: any = mat4.identity(mat4.create())
+const normalMatrix: any = mat4.identity(mat4.create())
 mat4.perspective(perspectiveMatrix, degToRad(60), 1, 0.1, 100)
 
 const initShaders = function(resolve: () => void, reject: (err: Error) => void) {
@@ -47,6 +48,8 @@ const initVariables = function() {
 
 	uniforms.uMvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix')
 	uniforms.uModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix')
+	uniforms.uNormalMatrix = gl.getUniformLocation(gl.program, 'u_NormalMatrix')
+	uniforms.uLightPosition = gl.getUniformLocation(gl.program, 'u_LightPosition')
 	uniforms.uHeight = gl.getUniformLocation(gl.program, 'u_Height')
 	uniforms.uWidth = gl.getUniformLocation(gl.program, 'u_Width')
 }
@@ -56,7 +59,7 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	const sphere = generateSphere(1, 128)
+	const sphere = generateSphere(1, 256)
 
 	const vertices: Float32Array = new Float32Array([...sphere.vertices])
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
@@ -79,6 +82,7 @@ const initBuffer = function(): void {
 	arraysToDraw = vertices.length / 3
 }
 
+let frame: number = 0
 const drawScene = function(): void {
 	gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
 
@@ -111,9 +115,19 @@ const drawScene = function(): void {
 	mat4.mul(modelViewMatrix, viewMatrix, modelMatrix)
 	mat4.mul(mvpMatrix, perspectiveMatrix, modelViewMatrix)
 
+	mat4.invert(normalMatrix, modelMatrix)
+	mat4.transpose(normalMatrix, normalMatrix)
+
 	gl.uniformMatrix4fv(uniforms.uMvpMatrix, false, mvpMatrix)
 	gl.uniformMatrix4fv(uniforms.uModelMatrix, false, modelMatrix)
+	gl.uniformMatrix4fv(uniforms.uNormalMatrix, false, normalMatrix)
 
+	gl.uniform3fv(uniforms.uLightPosition, [
+		3.0 * -Math.cos((2 * frame * Math.PI) / 360),
+		3.0 * Math.cos((2 * frame * Math.PI) / 360),
+		3.0 * Math.sin((2 * frame * Math.PI) / 360),
+	])
+	frame += 2
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
 
