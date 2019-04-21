@@ -1,5 +1,5 @@
 export function generateCircle(radius: number, accuracy: number): number[] {
-	const angle = (360 / accuracy) * (Math.PI / 180)
+	const angle = (2 * Math.PI) / accuracy
 	const vertices = []
 
 	for (let i = 0; i < accuracy; i += 1) {
@@ -101,4 +101,83 @@ export function generateSphere(
 	}
 
 	return { vertices, colors }
+}
+
+export class Prism {
+	public colors: number[]
+	public vertices: number[]
+
+	private n: number
+	private height: number
+	private radius: number
+	private angleStep: number
+
+	constructor(n: number, height: number, radius: number) {
+		this.n = n
+		this.height = height
+		this.radius = radius
+		this.angleStep = (2 * Math.PI) / this.n
+
+		this.colors = []
+		this.vertices = []
+		this.generatePrism()
+	}
+
+	public generatePrism(): void {
+		this.generateBases()
+		this.generateFaces()
+		this.colors.push(0, 0, 0)
+	}
+
+	private generateBases(): void {
+		const triangles = this.n - 2
+		for (let i = 0; i < 2; i += 1) {
+			const y = i === 0 ? this.height / 2 : -(this.height / 2)
+			const basePoint = [this.radius, y, 0]
+
+			for (let j = 0; j < triangles; j += 1) {
+				let angle = this.angleStep * (j + 1)
+
+				for (let k = 0; k < 3; k += 1) {
+					if (!k) {
+						this.vertices.push(...basePoint)
+						continue
+					}
+
+					angle += this.angleStep * (k - 1)
+
+					const x = this.radius * Math.cos(angle)
+					const z = this.radius * Math.sin(angle)
+
+					this.vertices.push(x, y, z)
+				}
+			}
+		}
+	}
+
+	private generateFaces(): void {
+		for (let i = 0; i < this.n; i += 1) {
+			const angle = this.angleStep * i
+
+			for (let t = 0; t < 2; t += 1) {
+				for (let j = 0; j < 3; j += 1) {
+					let y: number
+					let currentAngle: number
+
+					if (!t) {
+						y = j ? -(this.height / 2) : this.height / 2
+						currentAngle = j === 1 ? angle + this.angleStep : angle
+					} else {
+						y = j === 1 ? -(this.height / 2) : this.height / 2
+						currentAngle = j === 0 ? angle - this.angleStep : angle
+					}
+
+					const x = this.radius * Math.cos(currentAngle)
+					const z = this.radius * Math.sin(currentAngle)
+
+					this.vertices.push(x, y, z)
+				}
+			}
+		}
+	}
 }

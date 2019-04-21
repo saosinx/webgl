@@ -1,5 +1,5 @@
 import bezier from './bezier-easing'
-import { generateSphere } from './models'
+import { generateSphere, Prism } from './models'
 import WebGLCustomUtils from './webgl-custom-utils'
 import WebGLUtils, { addTexture, degToRad } from './webgl-google-utils'
 import { mat4, vec3 } from './webgl-matrix'
@@ -59,9 +59,9 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	const sphere = generateSphere(1, 128)
+	const prism = new Prism(3, 1.5, 0.75)
 
-	const vertices: Float32Array = new Float32Array([...sphere.vertices])
+	const vertices: Float32Array = new Float32Array([...prism.vertices])
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
@@ -70,14 +70,14 @@ const initBuffer = function(): void {
 	gl.vertexAttribPointer(attribs.aPosition, 3, gl.FLOAT, false, 0, 0)
 	gl.enableVertexAttribArray(attribs.aPosition)
 
-	const colors: Float32Array = new Float32Array([...sphere.colors])
-	const colorBuffer: WebGLBuffer = gl.createBuffer()
+	// const colors: Float32Array = new Float32Array([...prism.colors])
+	// const colorBuffer: WebGLBuffer = gl.createBuffer()
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
-	gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
+	// gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
+	// gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
 
-	gl.vertexAttribPointer(attribs.aColor, 3, gl.FLOAT, false, 0, 0)
-	gl.enableVertexAttribArray(attribs.aColor)
+	// gl.vertexAttribPointer(attribs.aColor, 3, gl.FLOAT, false, 0, 0)
+	// gl.enableVertexAttribArray(attribs.aColor)
 
 	arraysToDraw = vertices.length / 3
 }
