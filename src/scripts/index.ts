@@ -59,7 +59,7 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	const sphere = generateSphere(1, 256)
+	const sphere = generateSphere(1, 128)
 
 	const vertices: Float32Array = new Float32Array([...sphere.vertices])
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
