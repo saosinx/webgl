@@ -1,5 +1,5 @@
 import bezier from './bezier-easing'
-import { generateSphere, Prism } from './models'
+import { generateSphere, Prism, Torus } from './models'
 import WebGLCustomUtils from './webgl-custom-utils'
 import WebGLUtils, { addTexture, degToRad } from './webgl-google-utils'
 import { mat4, vec3 } from './webgl-matrix'
@@ -59,9 +59,11 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	const prism = new Prism(3, 1.5, 0.75)
+	// const prism = new Prism(30, 1.5, 0.75)
+	const torus = new Torus(50, 0.8, 0.2)
 
-	const vertices: Float32Array = new Float32Array([...prism.vertices])
+	// const vertices: Float32Array = new Float32Array([...prism.vertices])
+	const vertices: Float32Array = new Float32Array([...torus.vertices])
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
@@ -131,7 +133,7 @@ const drawScene = function(): void {
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
 
-	gl.drawArrays(gl.TRIANGLES, 0, arraysToDraw)
+	gl.drawArrays(gl.LINE_STRIP, 0, arraysToDraw)
 }
 
 const render = function(time: DOMHighResTimeStamp = 0) {

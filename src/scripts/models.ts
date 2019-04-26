@@ -103,6 +103,72 @@ export function generateSphere(
 	return { vertices, colors }
 }
 
+export class Torus {
+	public colors: number[]
+	public vertices: number[]
+
+	private n: number
+	private innerRadius: number
+	private outerRadius: number
+	private angleStep: number
+
+	constructor(n: number, innerRadius: number, outerRadius: number) {
+		this.n = n
+		this.innerRadius = innerRadius
+		this.outerRadius = outerRadius
+		this.angleStep = (2 * Math.PI) / this.n
+
+		this.colors = []
+		this.vertices = []
+		this.generateTorus()
+	}
+
+	private generateTorus(): void {
+		this.generateFaces()
+		this.colors.push(0, 0, 0)
+	}
+
+	private generateTriangle(point: any, left: boolean = true): void {
+		let alpha = 0
+		let theta = 0
+
+		for (let i = 0; i < 3; i += 1) {
+			if (!i) {
+				alpha = point.alpha
+				theta = point.theta
+			} else if (i === 1) {
+				alpha = point.alpha2
+				theta = point.theta2
+			} else {
+				alpha = left ? point.alpha : point.alpha2
+				theta = left ? point.theta2 : point.theta
+			}
+
+			const x = this.innerRadius * Math.cos(alpha) + this.outerRadius * Math.sin(theta) * Math.cos(alpha)
+			const y = this.outerRadius * Math.cos(theta)
+			const z = this.innerRadius * Math.sin(alpha) + this.outerRadius * Math.cos(theta) * Math.sin(alpha)
+
+			this.vertices.push(x, y, z)
+		}
+	}
+
+	private generateFaces(): void {
+		const point: any = {}
+		for (let i = 0; i < this.n; i += 1) {
+			point.alpha = this.angleStep * i
+			point.alpha2 = this.angleStep * (i + 1)
+
+			for (let j = 0; j < this.n; j += 1) {
+				point.theta = this.angleStep * j
+				point.theta2 = this.angleStep * (j + 1)
+
+				this.generateTriangle(point)
+				this.generateTriangle(point, false)
+			}
+		}
+	}
+}
+
 export class Prism {
 	public colors: number[]
 	public vertices: number[]
@@ -123,7 +189,7 @@ export class Prism {
 		this.generatePrism()
 	}
 
-	public generatePrism(): void {
+	private generatePrism(): void {
 		this.generateBases()
 		this.generateFaces()
 		this.colors.push(0, 0, 0)
