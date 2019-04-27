@@ -22,6 +22,6 @@ void main(void) {
 	v_Position = vec3(u_ModelMatrix * a_Position);
 	v_Normal = normalize(vec3(u_NormalMatrix * a_Position));
 
-	v_Color = a_Position;
-	// v_Color = vec4(0.8, 0.0, 0.0, 1.0);
+	// v_Color = a_Position;
+	v_Color = vec4(0.8, 0.0, 0.0, 1.0);
 }

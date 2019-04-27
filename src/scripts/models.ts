@@ -144,9 +144,11 @@ export class Torus {
 				theta = left ? point.theta2 : point.theta
 			}
 
-			const x = this.innerRadius * Math.cos(alpha) + this.outerRadius * Math.sin(theta) * Math.cos(alpha)
+			const x =
+				this.innerRadius * Math.cos(alpha) + this.outerRadius * Math.sin(theta) * Math.cos(alpha)
 			const y = this.outerRadius * Math.cos(theta)
-			const z = this.innerRadius * Math.sin(alpha) + this.outerRadius * Math.cos(theta) * Math.sin(alpha)
+			const z =
+				this.innerRadius * Math.sin(alpha) + this.outerRadius * Math.sin(theta) * Math.sin(alpha)
 
 			this.vertices.push(x, y, z)
 		}

@@ -60,7 +60,7 @@ const initTextures = function() {
 
 const initBuffer = function(): void {
 	// const prism = new Prism(30, 1.5, 0.75)
-	const torus = new Torus(50, 0.8, 0.2)
+	const torus = new Torus(50, 0.65, 0.65)
 
 	// const vertices: Float32Array = new Float32Array([...prism.vertices])
 	const vertices: Float32Array = new Float32Array([...torus.vertices])

@@ -4,6 +4,7 @@
 		"max-line-length": {
 			"options": [120]
 		},
+		"max-classes-per-file": false,
 		"variable-name": [
 			true,
 			"check-format",
