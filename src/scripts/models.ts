@@ -1,3 +1,5 @@
+import { mat4 } from './webgl-matrix'
+
 export function generateCircle(radius: number, accuracy: number): number[] {
 	const angle = (2 * Math.PI) / accuracy
 	const vertices = []
@@ -15,6 +17,7 @@ export function generateCircle(radius: number, accuracy: number): number[] {
 export class Sphere {
 	public vertices: number[]
 	public colors: number[]
+	public matrix: any
 
 	private radius: number
 	private n: number
@@ -25,6 +28,7 @@ export class Sphere {
 
 		this.vertices = []
 		this.colors = [0, 0, 0]
+		this.matrix = mat4.create()
 		this.generateSphere()
 	}
 
@@ -46,7 +50,7 @@ export class Sphere {
 
 			const x = this.radius * Math.cos(theta) * Math.sin(alpha)
 			const y = this.radius * Math.cos(alpha)
-			const z = -1 * +(Math.sin(theta) * Math.sin(alpha))
+			const z = -1 * this.radius * +(Math.sin(theta) * Math.sin(alpha))
 
 			this.vertices.push(x, y, z)
 		}
@@ -81,6 +85,7 @@ export class Sphere {
 export class Torus {
 	public colors: number[]
 	public vertices: number[]
+	public matrix: any
 
 	private n: number
 	private innerRadius: number
@@ -95,6 +100,7 @@ export class Torus {
 
 		this.colors = [0, 0, 0]
 		this.vertices = []
+		this.matrix = mat4.create()
 		this.generateTorus()
 	}
 
@@ -145,6 +151,7 @@ export class Torus {
 export class Prism {
 	public colors: number[]
 	public vertices: number[]
+	public matrix: any
 
 	private n: number
 	private height: number
@@ -159,6 +166,7 @@ export class Prism {
 
 		this.colors = [0, 0, 0]
 		this.vertices = []
+		this.matrix = mat4.create()
 		this.generatePrism()
 	}
 

@@ -24,12 +24,21 @@
 				"esSpecCompliant": true
 			}
 		],
+		"whitespace": [
+			false,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-separator",
+			"check-type"
+		],
 		"object-literal-sort-keys": false,
 		"curly": [true, "ignore-same-line"],
 		"quotemark": [true, "single", "jsx-double"],
 		"prefer-for-of": false,
 		"new-parens": true,
 		"only-arrow-functions": false,
+		"no-angle-bracket-type-assertion": false,
 		"no-arg": true,
 		"no-bitwise": false,
 		"no-string-literal": false,

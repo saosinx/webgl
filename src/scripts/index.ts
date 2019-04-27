@@ -13,8 +13,17 @@ let gl: IWebGLRenderingContextExtended
 
 const Utils = new WebGLCustomUtils()
 
-const attribs: any = {}
-const uniforms: any = {}
+const attribs: {
+	[key: string]: number
+} = {}
+const uniforms: {
+	[key: string]: WebGLUniformLocation
+} = {}
+
+const models: any = {
+	elements: [],
+	all: [],
+}
 
 let arraysToDraw: number = 0
 
@@ -24,6 +33,7 @@ const modelViewMatrix: any = mat4.identity(mat4.create())
 const perspectiveMatrix: any = mat4.identity(mat4.create())
 const mvpMatrix: any = mat4.identity(mat4.create())
 const normalMatrix: any = mat4.identity(mat4.create())
+
 mat4.perspective(perspectiveMatrix, degToRad(60), 1, 0.1, 100)
 
 const initShaders = function(resolve: () => void, reject: (err: Error) => void) {
@@ -59,20 +69,25 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	// const sphere = new Sphere(1, 50)
-	// const prism = new Prism(72, 1.5, 0.75)
-	const torus = new Torus(72, 0.65, 0.65)
+	// const sphere = new Sphere(0.5, 36)
+	// const prism = new Prism(4, 1.5, 0.75)
+	// const torus = new Torus(72, 0.65, 0.65)
+	models.elements.push(new Sphere(0.7, 36), new Prism(5, 1.85, 0.5), new Torus(72, 1.05, 0.25))
 
-	// const vertices: Float32Array = new Float32Array([...sphere.vertices])
+	for (let i = 0; i < models.elements.length; i += 1) {
+		models.all.push(...models.elements[i].vertices)
+	}
+
+	const vertices: Float32Array = new Float32Array([...models.all])
 	// const vertices: Float32Array = new Float32Array([...prism.vertices])
-	const vertices: Float32Array = new Float32Array([...torus.vertices])
+	// const vertices: Float32Array = new Float32Array([...torus.vertices])
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
 	gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
 
 	gl.vertexAttribPointer(attribs.aPosition, 3, gl.FLOAT, false, 0, 0)
-	gl.enableVertexAttribArray(attribs.aPosition)
+	gl.enableVertexAttribArray(attribs.aPositionas)
 
 	// const colors: Float32Array = new Float32Array([...prism.colors])
 	// const colorBuffer: WebGLBuffer = gl.createBuffer()
@@ -135,7 +150,7 @@ const drawScene = function(): void {
 	gl.uniform1f(uniforms.uWidth, gl.drawingBufferWidth)
 	gl.uniform1f(uniforms.uHeight, gl.drawingBufferHeight)
 
-	gl.drawArrays(gl.LINES, 0, arraysToDraw)
+	gl.drawArrays(gl.TRIANGLES, 0, arraysToDraw)
 }
 
 const render = function(time: DOMHighResTimeStamp = 0) {
@@ -149,14 +164,14 @@ const render = function(time: DOMHighResTimeStamp = 0) {
 }
 
 const webGLStart = function(): void {
-	const canvas: HTMLCanvasElement = Utils.$('canvas') as HTMLCanvasElement
+	const canvas: HTMLCanvasElement = <HTMLCanvasElement>Utils.$('canvas')
 
 	const powerPreference: string = 'default' || 'high-performance' || 'low-power'
-	gl = WebGLUtils.setupWebGL(canvas, {
+	gl = <IWebGLRenderingContextExtended>WebGLUtils.setupWebGL(canvas, {
 		alpha: true,
 		depth: true,
 		powerPreference,
-	}) as IWebGLRenderingContextExtended
+	})
 
 	Utils.gl = gl
 
