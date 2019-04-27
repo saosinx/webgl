@@ -12,95 +12,70 @@ export function generateCircle(radius: number, accuracy: number): number[] {
 	return vertices
 }
 
-export function generateSphere(
-	radius: number,
-	accuracy: number
-): {
-	vertices: number[]
-	colors: number[]
-} {
-	const n = accuracy
-	const vertices = []
-	const colors = []
+export class Sphere {
+	public vertices: number[]
+	public colors: number[]
 
-	function getCoords(alpha: number, phi: number): number[] {
-		const coords: number[] = []
+	private radius: number
+	private n: number
 
-		const x = radius * Math.cos(phi) * Math.sin(alpha)
-		const y = radius * Math.cos(alpha)
-		const z = -1 * +(Math.sin(phi) * Math.sin(alpha))
-		coords.push(x, y, z)
+	constructor(radius: number, n: number) {
+		this.radius = radius
+		this.n = n
 
-		return coords
+		this.vertices = []
+		this.colors = [0, 0, 0]
+		this.generateSphere()
 	}
 
-	function getTriangle(
-		alpha1: number,
-		alpha2: number,
-		phi1: number,
-		phi2: number,
-		left: boolean = false
-	): number[] {
-		const triangle: number[] = []
-		let a: number[]
-		let b: number[]
-		let c: number[]
-
-		if (left) {
-			a = getCoords(alpha1, phi2)
-			b = getCoords(alpha2, phi1)
-			c = getCoords(alpha1, phi1)
-		} else {
-			a = getCoords(alpha1, phi2)
-			b = getCoords(alpha2, phi2)
-			c = getCoords(alpha2, phi1)
-		}
-
-		triangle.push(...a, ...b, ...c)
-
-		return triangle
-	}
-
-	function getColor() {
-		const color: number[] = []
-		const r = Math.random()
-		const g = Math.random()
-		const b = Math.random()
+	private generateTriangle(point: any, left: boolean = true): void {
+		let alpha = 0
+		let theta = 0
 
 		for (let i = 0; i < 3; i += 1) {
-			color.push(r, g, b)
-		}
-
-		return color
-	}
-
-	for (let j = 0; j < n; j += 1) {
-		const phi1 = (2 * Math.PI * j) / n
-		const phi2 = (2 * Math.PI * (j + 1)) / n
-
-		for (let i = 0; i < n; i += 1) {
-			const alpha1 = (Math.PI * i) / n
-			const alpha2 = (Math.PI * (i + 1)) / n
-
-			if (i === 0) {
-				vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2))
-				colors.push(...getColor())
-				continue
-			} else if (i === n - 1) {
-				vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2, true))
-				colors.push(...getColor())
-				continue
+			if (!i) {
+				alpha = point.alpha
+				theta = point.theta
+			} else if (i === 1) {
+				alpha = point.alpha2
+				theta = point.theta2
+			} else {
+				alpha = left ? point.alpha : point.alpha2
+				theta = left ? point.theta2 : point.theta
 			}
 
-			const rgb = getColor()
-			vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2, true))
-			colors.push(...rgb)
-			vertices.push(...getTriangle(alpha1, alpha2, phi1, phi2))
-			colors.push(...rgb)
+			const x = this.radius * Math.cos(theta) * Math.sin(alpha)
+			const y = this.radius * Math.cos(alpha)
+			const z = -1 * +(Math.sin(theta) * Math.sin(alpha))
+
+			this.vertices.push(x, y, z)
 		}
 	}
 
-	return { vertices, colors }
+	private generateSphere(): void {
+		const point: any = {}
+
+		for (let j = 0; j < this.n; j += 1) {
+			point.theta = (2 * Math.PI * j) / this.n
+			point.theta2 = (2 * Math.PI * (j + 1)) / this.n
+
+			for (let i = 0; i < this.n; i += 1) {
+				point.alpha = (Math.PI * i) / this.n
+				point.alpha2 = (Math.PI * (i + 1)) / this.n
+
+				if (!i) {
+					this.generateTriangle(point, false)
+					continue
+				} else if (i === this.n - 1) {
+					this.generateTriangle(point)
+					continue
+				}
+
+				this.generateTriangle(point)
+				this.generateTriangle(point, false)
+			}
+		}
+	}
 }
 
 export class Torus {
@@ -118,14 +93,9 @@ export class Torus {
 		this.outerRadius = outerRadius
 		this.angleStep = (2 * Math.PI) / this.n
 
-		this.colors = []
+		this.colors = [0, 0, 0]
 		this.vertices = []
 		this.generateTorus()
-	}
-
-	private generateTorus(): void {
-		this.generateFaces()
-		this.colors.push(0, 0, 0)
 	}
 
 	private generateTriangle(point: any, left: boolean = true): void {
@@ -154,8 +124,9 @@ export class Torus {
 		}
 	}
 
-	private generateFaces(): void {
+	private generateTorus(): void {
 		const point: any = {}
+
 		for (let i = 0; i < this.n; i += 1) {
 			point.alpha = this.angleStep * i
 			point.alpha2 = this.angleStep * (i + 1)
@@ -186,7 +157,7 @@ export class Prism {
 		this.radius = radius
 		this.angleStep = (2 * Math.PI) / this.n
 
-		this.colors = []
+		this.colors = [0, 0, 0]
 		this.vertices = []
 		this.generatePrism()
 	}
@@ -194,7 +165,6 @@ export class Prism {
 	private generatePrism(): void {
 		this.generateBases()
 		this.generateFaces()
-		this.colors.push(0, 0, 0)
 	}
 
 	private generateBases(): void {
