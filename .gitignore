@@ -10,8 +10,6 @@
 
 # production #
 ###################
-/dist
-dist\
 dist
 
 # misc #
