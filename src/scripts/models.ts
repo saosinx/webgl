@@ -14,21 +14,28 @@ export function generateCircle(radius: number, accuracy: number): number[] {
 	return vertices
 }
 
-export class Sphere {
+class Model {
 	public vertices: number[]
 	public colors: number[]
 	public matrix: any
 
+	protected n: number
+
+	constructor(n: number) {
+		this.n = n
+		this.vertices = []
+		this.matrix = mat4.create()
+	}
+}
+
+export class Sphere extends Model {
 	private radius: number
-	private n: number
 
 	constructor(radius: number, n: number) {
-		this.radius = radius
-		this.n = n
+		super(n)
 
-		this.vertices = []
+		this.radius = radius
 		this.colors = [0, 0, 0]
-		this.matrix = mat4.create()
 		this.generateSphere()
 	}
 
@@ -82,25 +89,18 @@ export class Sphere {
 	}
 }
 
-export class Torus {
-	public colors: number[]
-	public vertices: number[]
-	public matrix: any
-
-	private n: number
+export class Torus extends Model {
 	private innerRadius: number
 	private outerRadius: number
-	private angleStep: number
+	private sector: number
 
 	constructor(n: number, innerRadius: number, outerRadius: number) {
-		this.n = n
+		super(n)
+
 		this.innerRadius = innerRadius
 		this.outerRadius = outerRadius
-		this.angleStep = (2 * Math.PI) / this.n
-
+		this.sector = (2 * Math.PI) / this.n
 		this.colors = [0, 0, 0]
-		this.vertices = []
-		this.matrix = mat4.create()
 		this.generateTorus()
 	}
 
@@ -134,12 +134,12 @@ export class Torus {
 		const point: any = {}
 
 		for (let i = 0; i < this.n; i += 1) {
-			point.alpha = this.angleStep * i
-			point.alpha2 = this.angleStep * (i + 1)
+			point.alpha = this.sector * i
+			point.alpha2 = this.sector * (i + 1)
 
 			for (let j = 0; j < this.n; j += 1) {
-				point.theta = this.angleStep * j
-				point.theta2 = this.angleStep * (j + 1)
+				point.theta = this.sector * j
+				point.theta2 = this.sector * (j + 1)
 
 				this.generateTriangle(point)
 				this.generateTriangle(point, false)
@@ -148,25 +148,18 @@ export class Torus {
 	}
 }
 
-export class Prism {
-	public colors: number[]
-	public vertices: number[]
-	public matrix: any
-
-	private n: number
+export class Prism extends Model {
 	private height: number
 	private radius: number
-	private angleStep: number
+	private sector: number
 
 	constructor(n: number, height: number, radius: number) {
-		this.n = n
+		super(n)
+
 		this.height = height
 		this.radius = radius
-		this.angleStep = (2 * Math.PI) / this.n
-
+		this.sector = (2 * Math.PI) / this.n
 		this.colors = [0, 0, 0]
-		this.vertices = []
-		this.matrix = mat4.create()
 		this.generatePrism()
 	}
 
@@ -182,7 +175,7 @@ export class Prism {
 			const basePoint = [this.radius, y, 0]
 
 			for (let j = 0; j < triangles; j += 1) {
-				let angle = this.angleStep * (j + 1)
+				let angle = this.sector * (j + 1)
 
 				for (let k = 0; k < 3; k += 1) {
 					if (!k) {
@@ -190,7 +183,7 @@ export class Prism {
 						continue
 					}
 
-					angle += this.angleStep * (k - 1)
+					angle += this.sector * (k - 1)
 
 					const x = this.radius * Math.cos(angle)
 					const z = this.radius * Math.sin(angle)
@@ -203,7 +196,7 @@ export class Prism {
 
 	private generateFaces(): void {
 		for (let i = 0; i < this.n; i += 1) {
-			const angle = this.angleStep * i
+			const angle = this.sector * i
 
 			for (let t = 0; t < 2; t += 1) {
 				for (let j = 0; j < 3; j += 1) {
@@ -212,10 +205,10 @@ export class Prism {
 
 					if (!t) {
 						y = j ? -(this.height / 2) : this.height / 2
-						currentAngle = j === 1 ? angle + this.angleStep : angle
+						currentAngle = j === 1 ? angle + this.sector : angle
 					} else {
 						y = j === 1 ? -(this.height / 2) : this.height / 2
-						currentAngle = j === 0 ? angle - this.angleStep : angle
+						currentAngle = j === 0 ? angle - this.sector : angle
 					}
 
 					const x = this.radius * Math.cos(currentAngle)

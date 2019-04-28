@@ -72,7 +72,7 @@ const initBuffer = function(): void {
 	// const sphere = new Sphere(0.5, 36)
 	// const prism = new Prism(4, 1.5, 0.75)
 	// const torus = new Torus(72, 0.65, 0.65)
-	models.elements.push(new Sphere(0.7, 36), new Prism(5, 1.85, 0.5), new Torus(72, 1.05, 0.25))
+	models.elements.push(new Sphere(0.7, 60), new Prism(5, 2, 0.5), new Torus(72, 1.05, 0.25))
 
 	for (let i = 0; i < models.elements.length; i += 1) {
 		models.all.push(...models.elements[i].vertices)

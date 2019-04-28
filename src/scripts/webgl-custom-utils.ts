@@ -22,55 +22,55 @@ export default class WebGLCustomUtils {
 	constructor(gl?: IWebGLRenderingContextExtended) {
 		this.scene = {
 			modelRotateX: {
-				elem: this.$('modelRotateX') as HTMLElement,
+				elem: this.$('modelRotateX'),
 				value: 0,
 			},
 			modelRotateY: {
-				elem: this.$('modelRotateY') as HTMLElement,
+				elem: this.$('modelRotateY'),
 				value: 0,
 			},
 			modelRotateZ: {
-				elem: this.$('modelRotateZ') as HTMLElement,
+				elem: this.$('modelRotateZ'),
 				value: 0,
 			},
 			modelTranslateX: {
-				elem: this.$('modelTranslateX') as HTMLElement,
+				elem: this.$('modelTranslateX'),
 				value: 0,
 			},
 			modelTranslateY: {
-				elem: this.$('modelTranslateY') as HTMLElement,
+				elem: this.$('modelTranslateY'),
 				value: 0,
 			},
 			modelTranslateZ: {
-				elem: this.$('modelTranslateZ') as HTMLElement,
+				elem: this.$('modelTranslateZ'),
 				value: 0,
 			},
 			cameraX: {
-				elem: this.$('cameraX') as HTMLElement,
+				elem: this.$('cameraX'),
 				value: 0,
 			},
 			cameraY: {
-				elem: this.$('cameraY') as HTMLElement,
+				elem: this.$('cameraY'),
 				value: 0,
 			},
 			cameraZ: {
-				elem: this.$('cameraZ') as HTMLElement,
+				elem: this.$('cameraZ'),
 				value: 0,
 			},
 		}
 
 		this.gl = gl
 
-		this.fpsCounter = this.$('fps-counter') as HTMLElement
-		this.frameCounter = this.$('frame-counter') as HTMLElement
-		this.timeCounter = this.$('time-counter') as HTMLElement
+		this.fpsCounter = this.$('fps-counter')
+		this.frameCounter = this.$('frame-counter')
+		this.timeCounter = this.$('time-counter')
 
 		this.lastTime = 0
 		this.frames = 0
 		this.fps = 0
 	}
 
-	public $(selector: string, qs?: boolean): HTMLElement | SVGElement {
+	public $(selector: string, qs?: boolean): HTMLElement {
 		if (!qs) return document.getElementById(selector)
 		return document.querySelector(selector)
 	}

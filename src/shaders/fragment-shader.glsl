@@ -14,5 +14,5 @@ void main(void) {
 	vec3 ambient = vec3(0.025, 0.025, 0.025) * v_Color.rgb;
 
 	// gl_FragColor = vec4(diffuse + ambient, 1.0);
-	gl_FragColor = vec4(v_Color.xyz, 1.0);
+	gl_FragColor = vec4(abs(v_Color.xyz), 1.0);
 }
