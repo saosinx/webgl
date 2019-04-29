@@ -14,7 +14,7 @@ varying vec3 v_Position;
 
 void main(void) {
 	float widthFixer = u_Height / u_Width;
-	gl_PointSize = 1.85;
+	gl_PointSize = 1.95;
 
 	gl_Position = u_MvpMatrix * a_Position;
 	gl_Position = vec4(gl_Position.x * widthFixer, gl_Position.yzw);

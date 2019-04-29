@@ -15,13 +15,19 @@ export function generateCircle(radius: number, accuracy: number): number[] {
 }
 
 class Model {
+	public x: number
+	public y: number
+	public z: number
 	public vertices: number[]
 	public colors: number[]
 	public matrix: any
 
 	protected n: number
 
-	constructor(n: number) {
+	constructor(n: number, x: number, y: number, z: number) {
+		this.x = x
+		this.y = y
+		this.z = z
 		this.n = n
 		this.vertices = []
 		this.matrix = mat4.create()
@@ -31,8 +37,8 @@ class Model {
 export class Sphere extends Model {
 	private radius: number
 
-	constructor(radius: number, n: number) {
-		super(n)
+	constructor(radius: number, n: number, x: number, y: number, z: number) {
+		super(n, x, y, z)
 
 		this.radius = radius
 		this.colors = [0, 0, 0]
@@ -55,9 +61,9 @@ export class Sphere extends Model {
 				theta = left ? point.theta2 : point.theta
 			}
 
-			const x = this.radius * Math.cos(theta) * Math.sin(alpha)
-			const y = this.radius * Math.cos(alpha)
-			const z = -1 * this.radius * +(Math.sin(theta) * Math.sin(alpha))
+			const x = this.x + this.radius * Math.cos(theta) * Math.sin(alpha)
+			const y = this.y + this.radius * Math.cos(alpha)
+			const z = this.z + -1 * this.radius * +(Math.sin(theta) * Math.sin(alpha))
 
 			this.vertices.push(x, y, z)
 		}
@@ -94,8 +100,8 @@ export class Torus extends Model {
 	private outerRadius: number
 	private sector: number
 
-	constructor(n: number, innerRadius: number, outerRadius: number) {
-		super(n)
+	constructor(n: number, innerRadius: number, outerRadius: number, x: number, y: number, z: number) {
+		super(n, x, y, z)
 
 		this.innerRadius = innerRadius
 		this.outerRadius = outerRadius
@@ -120,11 +126,9 @@ export class Torus extends Model {
 				theta = left ? point.theta2 : point.theta
 			}
 
-			const x =
-				this.innerRadius * Math.cos(alpha) + this.outerRadius * Math.sin(theta) * Math.cos(alpha)
-			const y = this.outerRadius * Math.cos(theta)
-			const z =
-				this.innerRadius * Math.sin(alpha) + this.outerRadius * Math.sin(theta) * Math.sin(alpha)
+			const x = this.x + this.innerRadius * Math.cos(alpha) + this.outerRadius * Math.sin(theta) * Math.cos(alpha)
+			const y = this.y + this.outerRadius * Math.cos(theta)
+			const z = this.z + this.innerRadius * Math.sin(alpha) + this.outerRadius * Math.sin(theta) * Math.sin(alpha)
 
 			this.vertices.push(x, y, z)
 		}
@@ -153,8 +157,8 @@ export class Prism extends Model {
 	private radius: number
 	private sector: number
 
-	constructor(n: number, height: number, radius: number) {
-		super(n)
+	constructor(n: number, height: number, radius: number, x: number, y: number, z: number) {
+		super(n, x, y, z)
 
 		this.height = height
 		this.radius = radius
@@ -171,7 +175,7 @@ export class Prism extends Model {
 	private generateBases(): void {
 		const triangles = this.n - 2
 		for (let i = 0; i < 2; i += 1) {
-			const y = i === 0 ? this.height / 2 : -(this.height / 2)
+			const y = i === 0 ? this.y + this.height / 2 : this.y + -(this.height / 2)
 			const basePoint = [this.radius, y, 0]
 
 			for (let j = 0; j < triangles; j += 1) {
@@ -185,8 +189,8 @@ export class Prism extends Model {
 
 					angle += this.sector * (k - 1)
 
-					const x = this.radius * Math.cos(angle)
-					const z = this.radius * Math.sin(angle)
+					const x = this.x + this.radius * Math.cos(angle)
+					const z = this.z + this.radius * Math.sin(angle)
 
 					this.vertices.push(x, y, z)
 				}
@@ -204,15 +208,15 @@ export class Prism extends Model {
 					let currentAngle: number
 
 					if (!t) {
-						y = j ? -(this.height / 2) : this.height / 2
+						y = j ? this.y + -(this.height / 2) : this.y + this.height / 2
 						currentAngle = j === 1 ? angle + this.sector : angle
 					} else {
 						y = j === 1 ? -(this.height / 2) : this.height / 2
 						currentAngle = j === 0 ? angle - this.sector : angle
 					}
 
-					const x = this.radius * Math.cos(currentAngle)
-					const z = this.radius * Math.sin(currentAngle)
+					const x = this.x + this.radius * Math.cos(currentAngle)
+					const z = this.z + this.radius * Math.sin(currentAngle)
 
 					this.vertices.push(x, y, z)
 				}

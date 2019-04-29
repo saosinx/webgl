@@ -69,18 +69,21 @@ const initTextures = function() {
 }
 
 const initBuffer = function(): void {
-	// const sphere = new Sphere(0.5, 36)
-	// const prism = new Prism(4, 1.5, 0.75)
-	// const torus = new Torus(72, 0.65, 0.65)
-	models.elements.push(new Sphere(0.7, 60), new Prism(5, 2, 0.5), new Torus(72, 1.05, 0.25))
+	// models.elements.push(new Sphere(0.7, 60, 0, 0, 0))
+	// models.elements.push(new Sphere(0.7, 60, 0, 0, 0), new Prism(36, 2, 0.5, 0, 0, 0), new Torus(72, 1.05, 0.25, 0, 0, 0))
+	for (let i = -2; i < 1; i += 1) {
+		for (let j = -2; j < 1; j += 1) {
+			for (let k = -2; k < 1; k += 1) {
+				models.elements.push(new Sphere(0.45, 36, j + 1, i + 1, k + 1))
+			}
+		}
+	}
 
 	for (let i = 0; i < models.elements.length; i += 1) {
 		models.all.push(...models.elements[i].vertices)
 	}
 
 	const vertices: Float32Array = new Float32Array([...models.all])
-	// const vertices: Float32Array = new Float32Array([...prism.vertices])
-	// const vertices: Float32Array = new Float32Array([...torus.vertices])
 	const vertexBuffer: WebGLBuffer = gl.createBuffer()
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
