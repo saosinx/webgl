@@ -1,19 +1,5 @@
 import { mat4 } from './webgl-matrix'
 
-export function generateCircle(radius: number, accuracy: number): number[] {
-	const angle = (2 * Math.PI) / accuracy
-	const vertices = []
-
-	for (let i = 0; i < accuracy; i += 1) {
-		const x = radius * Math.cos(angle * i)
-		const y = radius * Math.sin(angle * i)
-
-		vertices.push(x, y)
-	}
-
-	return vertices
-}
-
 class Model {
 	public x: number
 	public y: number

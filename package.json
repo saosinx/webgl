@@ -1,37 +1,33 @@
 {
   "name": "webgl",
   "version": "1.0.0",
-  "main": "gulpfile.js",
+  "description": "",
+  "private": true,
   "scripts": {
-    "start": "gulp clean|gulp default",
+    "build-dev": "webpack --mode=development --config webpack.config.dev.js",
+    "build-prod": "webpack --mode=production --config webpack.config.prod.js",
+    "start": "webpack serve --open --config webpack.config.dev.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Nikita Zhurawski",
+  "author": "Nikita Zhurawski <zhurawski.nikita@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
-    "babelify": "^10.0.0",
-    "browserify": "^16.2.3",
-    "del": "^3.0.0",
-    "fs-extra": "^7.0.1",
-    "gulp": "^4.0.0",
-    "gulp-connect": "^5.7.0",
-    "gulp-pug": "^4.0.1",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.4",
-    "gulp-tabify": "0.0.2",
-    "gulp-typescript": "^5.0.0",
-    "gulplog": "^1.0.0",
-    "node-sass": "^4.11.0",
-    "tsify": "^4.0.1",
-    "tslint": "^5.11.0",
-    "typescript": "^3.2.2",
-    "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0"
+    "css-loader": "^5.2.1",
+    "html-loader": "^2.1.2",
+    "html-webpack-plugin": "^5.3.1",
+    "sass": "^1.32.8",
+    "sass-loader": "^11.0.1",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^8.1.0",
+    "typescript": "^4.2.4",
+    "webpack": "^5.31.2",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
-    "bezier-easing": "^2.1.0"
+    "bezier-easing": "^2.1.0",
+    "module-from-string": "^2.2.2"
   },
   "repository": {
     "type": "git",
@@ -40,6 +36,5 @@
   "bugs": {
     "url": "https://github.com/saosinx/webgl/issues"
   },
-  "homepage": "https://github.com/saosinx/webgl#readme",
-  "description": ""
+  "homepage": "https://github.com/saosinx/webgl#readme"
 }

@@ -1,0 +1,63 @@
+@import './colors';
+
+input[type='range'] {
+	background: 0;
+	height: 1.5625rem;
+	width: 21.875rem;
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+
+	&::-webkit-slider-runnable-track {
+		background: $color-green;
+		border-radius: 1px;
+		border: 0;
+		cursor: pointer;
+		height: 5px;
+		width: 100%;
+	}
+
+	&::-moz-range-track {
+		background: $color-green;
+		border-radius: 1px;
+		border: 0;
+		cursor: pointer;
+		height: 5px;
+		width: 100%;
+	}
+
+	&::-webkit-slider-thumb {
+		background: $color-gallery;
+		box-shadow: 0 0 6px 3px $color-black;
+		border-radius: 50%;
+		border: 0 solid $color-green;
+		cursor: pointer;
+		margin-top: -0.4375rem;
+		height: 16px;
+		width: 16px;
+		-webkit-appearance: none;
+	}
+
+	&::-moz-range-thumb {
+		background: $color-gallery;
+		box-shadow: 0 0 6px 3px $color-black;
+		border-radius: 50%;
+		border: 0 solid $color-green;
+		cursor: pointer;
+		margin-top: -0.4375rem;
+		height: 16px;
+		width: 16px;
+		-webkit-appearance: none;
+	}
+
+	&:focus {
+		outline: none;
+
+		&::-webkit-slider-runnable-track {
+			background: $color-chartreuse;
+		}
+		&::-moz-range-track {
+			background: $color-chartreuse;
+		}
+	}
+}

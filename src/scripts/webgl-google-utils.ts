@@ -58,36 +58,36 @@
  * visible.
  */
 
-export function getPositionFromMatrix(matrix: number[]): { x: number; y: number; z: number } {
-	return { x: matrix[12], y: matrix[13], z: matrix[14] }
-}
+export const getPositionFromMatrix = (matrix: number[]) => ({
+	x: matrix[12],
+	y: matrix[13],
+	z: matrix[14],
+})
 
-export function getRotationFromMatrix(matrix: number[]) {
-	return { x: Math.asin(matrix[6]), y: Math.asin(matrix[8]), z: Math.asin(matrix[1]) }
-}
+export const getRotationFromMatrix = (matrix: number[]) => ({
+	x: Math.asin(matrix[6]),
+	y: Math.asin(matrix[8]),
+	z: Math.asin(matrix[1]),
+})
 
-export function degToRad(degrees: number | string): number {
-	return (parseFloat(<string>degrees) * Math.PI) / 180
-}
+export const rad = (degrees: number | string) => (parseFloat(String(degrees)) * Math.PI) / 180
 
-export function getMousePosition(event: MouseEvent): { x: number; y: number } {
-	return { x: event.offsetX, y: event.offsetY }
-}
+export const getMousePosition = (event: MouseEvent) => ({ x: event.offsetX, y: event.offsetY })
 
-export function getNodeFromMouse(
+export const getNodeFromMouse = (
 	canvas: HTMLCanvasElement,
 	mouse: MouseEvent,
 	gridSize: number,
 	GRID_WIDTH: number,
 	GRID_HEIGHT: number
-): { x: number; y: number } | null {
+) => {
 	// We're getting it in this format: left=0, right=gridSize. Same with top and bottom.
 	// First, let's see what the grid looks like compared to the canvas.
 	// Its borders will always be touching whichever part's thinner: the width or the height.
 
-	const middleCanvas: { x: number; y: number } = { x: canvas.width / 2, y: canvas.height / 2 }
+	const middleCanvas = { x: canvas.width / 2, y: canvas.height / 2 }
 
-	const pos: { x: number; y: number } = {
+	const pos = {
 		x: (gridSize * (mouse.x - (middleCanvas.x - GRID_WIDTH * 0.5))) / GRID_WIDTH,
 		y: (gridSize * (mouse.y - (middleCanvas.y - GRID_HEIGHT * 0.5))) / GRID_HEIGHT,
 	}
@@ -99,20 +99,21 @@ export function getNodeFromMouse(
 		return null
 	}
 }
-export function getCoordinateFromMouse(
+
+export const getCoordinateFromMouse = (
 	canvas: HTMLCanvasElement,
 	mouse: MouseEvent,
 	gridSize: number,
 	GRID_WIDTH: number,
 	GRID_HEIGHT: number
-): { x: number; y: number } {
+) => {
 	// We're getting it in this format: left=0, right=gridSize. Same with top and bottom.
 	// First, let's see what the grid looks like compared to the canvas.
 	// Its borders will always be touching whichever part's thinner: the width or the height.
 
-	const middleCanvas: { x: number; y: number } = { x: canvas.width, y: canvas.height }
+	const middleCanvas = { x: canvas.width, y: canvas.height }
 
-	const pos: { x: number; y: number } = {
+	const pos = {
 		x: (gridSize * (mouse.x - (middleCanvas.x - GRID_WIDTH * 0.5))) / GRID_WIDTH,
 		y: (gridSize * (mouse.y - (middleCanvas.y - GRID_HEIGHT * 0.5))) / GRID_HEIGHT,
 	}
@@ -125,12 +126,8 @@ export function getCoordinateFromMouse(
  * For example, to use the texture stored at TEXTURE0, you set the sampler to 0.
  */
 
-export function addTexture(
-	gl: WebGLRenderingContext,
-	imageURL: string,
-	glTexture: GLenum
-): WebGLTexture {
-	function isPowerOf2(value: number): boolean {
+export function addTexture(gl: WebGLRenderingContext, imageURL: string, glTexture: GLenum): WebGLTexture {
+	const isPowerOf2 = (value: number) => {
 		if ((value & (value - 1)) === 0) {
 			return true
 		}
@@ -142,7 +139,7 @@ export function addTexture(
 
 	const texture: IWebGLTextureExtended = gl.createTexture()
 	texture.image = new Image()
-	texture.image.onload = function(): void {
+	texture.image.onload = function () {
 		gl.activeTexture(glTexture)
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1)
 		gl.bindTexture(gl.TEXTURE_2D, texture)
@@ -159,16 +156,17 @@ export function addTexture(
 	return texture
 }
 
-export function ease(from: number, to: number, easiness: number): number {
+export function ease(from: number, to: number, easiness: number) {
 	if (easiness > 1) {
 		easiness = 1 / easiness
 	}
+
 	return (to - from) * easiness
 }
 
-export function displayAlertMatrix(matrix: number[]): void {
-	let testString: string = ''
-	for (let i: number = 0, l: number = matrix.length; i < l; i++) {
+export function displayAlertMatrix(matrix: number[]) {
+	let testString = ''
+	for (let i = 0, l = matrix.length; i < l; i++) {
 		if (i % 4 === 0 && i > 0) {
 			testString += '\n'
 		}
@@ -178,16 +176,16 @@ export function displayAlertMatrix(matrix: number[]): void {
 	alert(testString)
 }
 
-export function addVectors(vec1: number[], vec2: number[]): number[] {
-	for (let i: number = 0, l: number = vec1.length; i < l; i++) {
+export function addVectors(vec1: number[], vec2: number[]) {
+	for (let i = 0, l = vec1.length; i < l; i++) {
 		if (vec2[i]) {
 			vec1[i] += vec2[i]
 		}
 	}
 	return vec1
 }
-export function subtractVectors(vec1: number[], vec2: number[]): number[] {
-	for (let i: number = 0, l: number = vec1.length; i < l; i++) {
+export function subtractVectors(vec1: number[], vec2: number[]) {
+	for (let i = 0, l = vec1.length; i < l; i++) {
 		if (vec2[i]) {
 			vec1[i] -= vec2[i]
 		}
@@ -196,17 +194,17 @@ export function subtractVectors(vec1: number[], vec2: number[]): number[] {
 }
 
 export function inverseVector(vec: number[]): number[] {
-	for (let i: number = 0, l: number = vec.length; i < l; i++) {
+	for (let i = 0, l = vec.length; i < l; i++) {
 		vec[i] = 1 - Math.abs(vec[i])
 	}
 	return vec
 }
 
-export function alertMat4(mat: number[]): void {
-	let string: string = '['
+export function alertMat4(mat: number[]) {
+	let string = '['
 
-	for (let i: number = 0; i < 4; i++) {
-		for (let j: number = 0; j < 4; j++) {
+	for (let i = 0; i < 4; i++) {
+		for (let j = 0; j < 4; j++) {
 			string += Math.round(mat[i * 4 + j]).toString() + ', \t'
 		}
 		string += '\n'
@@ -215,13 +213,13 @@ export function alertMat4(mat: number[]): void {
 	alert(string)
 }
 
-export function Float32Concat(original: number[], addition: number[]): Float32Array | number[] {
+export function Float32Concat(original: number[], addition: number[]) {
 	if (!original) {
 		return addition
 	}
 
-	const length: number = original.length
-	const totalLength: number = length + addition.length
+	const length = original.length
+	const totalLength = length + addition.length
 
 	const result = new Float32Array(totalLength)
 
@@ -231,23 +229,23 @@ export function Float32Concat(original: number[], addition: number[]): Float32Ar
 	return result
 }
 
-let totalTimePassed: number = 0
-let lastTimePassed: number = 0
-export function ConsoleTimePassed(message: string): void {
+let totalTimePassed = 0
+let lastTimePassed = 0
+export function ConsoleTimePassed(message: string) {
 	totalTimePassed = new Date().getTime()
 	console.log(message + ': ' + (totalTimePassed - lastTimePassed))
 	lastTimePassed = totalTimePassed
 }
 
-export function easeNormalVec(vec: number[]): number[] {
+export function easeNormalVec(vec: number[]) {
 	vec[0] += (1 - vec[0]) / 2
 	vec[1] += (1 - vec[1]) / 2
 	vec[2] += (1 - vec[2]) / 2
 
 	return vec
 }
-export function getBetweenVec(min: number[], range: number[]): number[] {
-	const vec: number[] = [0, 0, 0]
+export function getBetweenVec(min: number[], range: number[]) {
+	const vec = [0, 0, 0]
 	vec[0] = Math.random() * range[0] + min[0]
 	vec[1] = Math.random() * range[1] + min[1]
 	vec[2] = Math.random() * range[2] + min[2]
@@ -255,10 +253,10 @@ export function getBetweenVec(min: number[], range: number[]): number[] {
 	return vec
 }
 
-export function normalize(vec: number[]): number[] {
-	let i: number = 0
-	let total: number = 0
-	const l: number = vec.length
+export function normalize(vec: number[]) {
+	let i = 0
+	let total = 0
+	const l = vec.length
 	for (i = 0; i < l; i++) {
 		total += vec[i]
 	}
@@ -268,16 +266,9 @@ export function normalize(vec: number[]): number[] {
 	return vec
 }
 
-const WebGLUtils = (function(): {
-	setupWebGL: (
-		canvas: HTMLCanvasElement,
-		opt_attribs?: object,
-		opt_onError?: any
-	) => CanvasRenderingContext2D | WebGLRenderingContext | null
-	create3DContext: (
-		canvas: HTMLCanvasElement,
-		opt_attribs?: object
-	) => CanvasRenderingContext2D | WebGLRenderingContext | null
+const WebGLUtils = (function (): {
+	setupWebGL: (canvas: HTMLCanvasElement, opt_attribs?: object, opt_onError?: any) => RenderingContext | null
+	create3DContext: (canvas: HTMLCanvasElement, opt_attribs?: object) => RenderingContext | null
 } {
 	/**
 	 * Creates the HTLM for a failure message
@@ -285,19 +276,16 @@ const WebGLUtils = (function(): {
 	 *        canvas.
 	 * @return {string} The html.
 	 */
-	const makeFailHTML = function(msg: string): string {
-		return (
-			'' +
-			'<table style="background-color: #8CE; width: 100%; height: 100%;"><tr>' +
-			'<td align="center">' +
-			'<div style="display: table-cell; vertical-align: middle;">' +
-			'<div style="">' +
-			msg +
-			'</div>' +
-			'</div>' +
-			'</td></tr></table>'
-		)
-	}
+	const makeFailHTML = (msg: string): string =>
+		'' +
+		'<table style="background-color: #8CE; width: 100%; height: 100%;"><tr>' +
+		'<td align="center">' +
+		'<div style="display: table-cell; vertical-align: middle;">' +
+		'<div style="">' +
+		msg +
+		'</div>' +
+		'</div>' +
+		'</td></tr></table>'
 
 	/**
 	 * Mesasge for getting a webgl browser
@@ -327,18 +315,20 @@ const WebGLUtils = (function(): {
 	 *     if there is an error during creation.
 	 * @return {WebGLRenderingContext} The created context.
 	 */
-	const setupWebGL = function(
+	const setupWebGL = function (
 		canvas: HTMLCanvasElement,
 		opt_attribs?: object,
 		opt_onError?: any
-	): CanvasRenderingContext2D | WebGLRenderingContext | null {
-		function handleCreationError(msg: string): void {
-			const container: Node = canvas.parentNode
+	): RenderingContext | null {
+		const handleCreationError = (msg: string) => {
+			const container = canvas.parentNode
+
 			if (container) {
-				let str: string = (<any>window).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
+				let str = (<any>window).WebGLRenderingContext ? OTHER_PROBLEM : GET_A_WEBGL_BROWSER
 				if (msg) {
 					str += '<br/><br/>Status: ' + msg
 				}
+
 				container.textContent = makeFailHTML(str)
 			}
 		}
@@ -346,20 +336,17 @@ const WebGLUtils = (function(): {
 		opt_onError = opt_onError || handleCreationError
 
 		if (canvas.addEventListener) {
-			canvas.addEventListener(
-				'webglcontextcreationerror',
-				(event: WebGLContextEvent): void => opt_onError(event.statusMessage)
+			canvas.addEventListener('webglcontextcreationerror', (event: WebGLContextEvent) =>
+				opt_onError(event.statusMessage)
 			)
 		}
-		const context: CanvasRenderingContext2D | WebGLRenderingContext | null = create3DContext(
-			canvas,
-			opt_attribs
-		)
-		if (!context) {
-			if (!(<any>window).WebGLRenderingContext) {
-				opt_onError('')
-			}
+
+		const context = create3DContext(canvas, opt_attribs)
+
+		if (!context && !window.WebGLRenderingContext) {
+			opt_onError('')
 		}
+
 		return context
 	}
 
@@ -369,12 +356,10 @@ const WebGLUtils = (function(): {
 	 *     from. If one is not passed in one will be created.
 	 * @return {!WebGLContext} The created context.
 	 */
-	const create3DContext = function(
-		canvas: HTMLCanvasElement,
-		opt_attribs?: object
-	): CanvasRenderingContext2D | WebGLRenderingContext | null {
-		const names: string[] = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']
-		let context: CanvasRenderingContext2D | WebGLRenderingContext | null = null
+	const create3DContext = (canvas: HTMLCanvasElement, opt_attribs?: object): RenderingContext | null => {
+		const names = ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']
+		let context: RenderingContext | null
+
 		for (const name of names) {
 			try {
 				context = canvas.getContext(name, opt_attribs)
@@ -385,23 +370,11 @@ const WebGLUtils = (function(): {
 				break
 			}
 		}
+
 		return context
 	}
 
 	return { setupWebGL, create3DContext }
-})()
-
-window.requestAnimationFrame = (function() {
-	return (
-		(<any>window).requestAnimationFrame ||
-		(<any>window).webkitRequestAnimationFrame ||
-		(<any>window).mozRequestAnimationFrame ||
-		(<any>window).oRequestAnimationFrame ||
-		(<any>window).msRequestAnimationFrame ||
-		function(callback: () => void): void {
-			window.setTimeout(callback, 1000 / 15)
-		}
-	)
 })()
 
 export default WebGLUtils

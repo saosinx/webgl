@@ -1,19 +1,19 @@
 {
-  "arrowParens": "always",
+  "arrowParens": "avoid",
   "bracketSpacing": true,
+  "disableLanguages": [
+    "vue",
+    "json"
+  ],
   "endOfLine": "auto",
   "htmlWhitespaceSensitivity": "css",
   "jsxBracketSameLine": false,
   "jsxSingleQuote": false,
-  "printWidth": 100,
+  "printWidth": 120,
   "proseWrap": "preserve",
-  "tabWidth": 2,
-  "trailingComma": "es5",
-  "useTabs": true,
   "semi": false,
   "singleQuote": true,
-  "disableLanguages": [
-    "vue",
-    "json"
-  ]
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": true
 }

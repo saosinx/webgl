@@ -1,33 +1,8 @@
-/*
- * Copyright 2012, Gregg Tavares.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- *     * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following disclaimer
- * in the documentation and/or other materials provided with the
- * distribution.
- *     * Neither the name of Gregg Tavares. nor the names of his
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+import fragmentShader from '../shaders/fragment-shader.glsl'
+import vertexShader from '../shaders/vertex-shader.glsl'
+import { Shader } from './constants'
+
+const parseImport = (str: string) => JSON.parse(str.replace('module.exports = ', ''))
 
 /**
  * Creates a program, attaches shaders, binds attrib locations, links the
@@ -42,38 +17,58 @@
  * If you want something else pass an callback. It's passed an error message.
  * @memberOf module:webgl-utils
  */
-export function createProgram(
+export const createProgram = (
 	gl: WebGLRenderingContext,
 	shaders: WebGLShader[],
 	opt_attribs?: string[],
 	opt_locations?: number[],
 	opt_errorCallback?: any
-): WebGLProgram | null {
+) => {
 	const errFn: (errorMessage: string) => void | Console = opt_errorCallback || console.error
-	const program: WebGLProgram = gl.createProgram()
+	const program = gl.createProgram()
 
-	shaders.forEach((shader): void => gl.attachShader(program, shader))
+	shaders.forEach(shader => gl.attachShader(program, shader))
 
 	if (opt_attribs) {
-		opt_attribs.forEach(
-			(attrib, ndx): void =>
-				gl.bindAttribLocation(program, opt_locations ? opt_locations[ndx] : ndx, attrib)
+		opt_attribs.forEach((attrib, ndx) =>
+			gl.bindAttribLocation(program, opt_locations ? opt_locations[ndx] : ndx, attrib)
 		)
 	}
 
 	gl.linkProgram(program)
 
 	// Check the link status
-	const linked: any = gl.getProgramParameter(program, gl.LINK_STATUS)
+	const linked = gl.getProgramParameter(program, gl.LINK_STATUS)
 	if (!linked) {
 		// something went wrong with the link
-		const lastError: string = gl.getProgramInfoLog(program)
+		const lastError = gl.getProgramInfoLog(program)
 		errFn('Error in program linking:' + lastError)
 
 		gl.deleteProgram(program)
 		return null
 	}
+
 	return program
+}
+
+export const createShader = (gl: WebGLRenderingContext, type: Shader) => {
+	const compileShader = (shader: WebGLShader, source: string) => {
+		gl.shaderSource(shader, parseImport(source))
+		gl.compileShader(shader)
+		return shader
+	}
+
+	const createFragmentShader = () => compileShader(gl.createShader(gl.FRAGMENT_SHADER), fragmentShader)
+	const createVertexShader = () => compileShader(gl.createShader(gl.VERTEX_SHADER), vertexShader)
+
+	switch (type) {
+		case Shader.Fragment:
+			return createFragmentShader()
+		case Shader.Vertex:
+			return createVertexShader()
+		default:
+			return null
+	}
 }
 
 /**
@@ -84,17 +79,16 @@ export function createProgram(
  * @return {boolean} true if the canvas was resized.
  * @memberOf module:webgl-utils
  */
-export function resizeCanvasToDisplaySize(
-	canvas: HTMLCanvasElement,
-	multiplier: number = 1
-): boolean {
+export const resizeCanvasToDisplaySize = (canvas: HTMLCanvasElement, multiplier = 1) => {
 	const width = (canvas.clientWidth * multiplier) | 0
 	const height = (canvas.clientHeight * multiplier) | 0
+
 	if (canvas.width !== width || canvas.height !== height) {
 		canvas.width = width
 		canvas.height = height
 		return true
 	}
+
 	return false
 }
 
@@ -104,49 +98,16 @@ export function resizeCanvasToDisplaySize(
  * @return {boolean} true if the canvas was resized.
  * @memberOf module:webgl-utils
  */
-export function resizeCanvasToSquare(canvas: HTMLCanvasElement): boolean {
-	const styles: CSSStyleDeclaration = getComputedStyle(canvas)
-	const width: number = parseFloat(styles.width)
-	const height: number = parseFloat(styles.height)
+export const resizeCanvasToSquare = (canvas: HTMLCanvasElement) => {
+	const styles = getComputedStyle(canvas)
+	const width = parseFloat(styles.width)
+	const height = parseFloat(styles.height)
 
 	if (canvas.width !== width || canvas.height !== height) {
 		canvas.width = width
 		canvas.height = width
 		return true
 	}
+
 	return false
-}
-
-export function createShader(
-	gl: WebGLRenderingContext,
-	type: string,
-	resolve: (value: WebGLShader | PromiseLike<{}>) => void,
-	reject: (reason: Error) => void
-): void {
-	function handleShader(data: string): WebGLShader | null {
-		let shader: WebGLShader
-		if (type === 'fragment-shader') {
-			shader = gl.createShader(gl.FRAGMENT_SHADER)
-		} else if (type === 'vertex-shader') {
-			shader = gl.createShader(gl.VERTEX_SHADER)
-		} else {
-			return null
-		}
-
-		gl.shaderSource(shader, data)
-		gl.compileShader(shader)
-
-		return shader
-	}
-
-	fetch(`http://localhost:1337/assets/shaders/${type}.glsl`)
-		.then((resp: Response) => resp.text())
-		.then((data: string) => handleShader(data))
-		.then((shader: WebGLShader) => resolve(shader))
-		.catch((err: Error) => reject(err))
-
-	// if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-	// 	alert(gl.getShaderInfoLog(shader))
-	// 	return null
-	// }
 }
