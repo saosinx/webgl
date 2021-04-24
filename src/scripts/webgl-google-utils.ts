@@ -125,12 +125,6 @@ export const getCoordinateFromMouse = (
  */
 
 export function addTexture(gl: WebGLRenderingContext, imageURL: string, glTexture: GLenum): WebGLTexture {
-	const isPowerOf2 = (value: number) => {
-		if ((value & (value - 1)) === 0) {
-			return true
-		}
-	}
-
 	interface IWebGLTextureExtended extends WebGLTexture {
 		image?: HTMLImageElement
 	}

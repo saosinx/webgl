@@ -1,8 +1,6 @@
-import fragmentShader from '../shaders/fragment-shader.glsl'
-import vertexShader from '../shaders/vertex-shader.glsl'
+import fragmentShader from '../shaders/fragment-shader.glsl?raw'
+import vertexShader from '../shaders/vertex-shader.glsl?raw'
 import { Shader } from './constants'
-
-const parseImport = (str: string) => JSON.parse(str.replace('module.exports = ', ''))
 
 /**
  * Creates a program, attaches shaders, binds attrib locations, links the
@@ -53,7 +51,7 @@ export const createProgram = (
 
 export const createShader = (gl: WebGLRenderingContext, type: Shader) => {
 	const compileShader = (shader: WebGLShader, source: string) => {
-		gl.shaderSource(shader, parseImport(source))
+		gl.shaderSource(shader, source)
 		gl.compileShader(shader)
 		return shader
 	}

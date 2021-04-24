@@ -6,9 +6,9 @@ export const deg = (rad: number) => (rad * 180) / Math.PI
 export default class WebGLCustomUtils {
 	public gl: IWebGLRenderingContext
 	public scene: IScene
-	public fpsCounter: HTMLElement
-	public frameCounter: HTMLElement
-	public timeCounter: HTMLElement
+	public fpsCounter: Element
+	public frameCounter: Element
+	public timeCounter: Element
 	public lastTime: number
 	public frames: number
 	public fps: number
@@ -64,7 +64,7 @@ export default class WebGLCustomUtils {
 		this.fps = 0
 	}
 
-	public $(selector: string, qs?: boolean): HTMLElement {
+	public $(selector: string, qs?: boolean) {
 		if (!qs) return document.getElementById(selector)
 		return document.querySelector(selector)
 	}
@@ -102,7 +102,7 @@ export default class WebGLCustomUtils {
 		})
 	}
 
-	protected updateInfobar(elem: HTMLElement): void {
+	protected updateInfobar(elem: Element): void {
 		elem.innerHTML = this.scene[elem.id].value.toFixed(2)
 	}
 }

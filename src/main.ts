@@ -1,6 +1,5 @@
 import WebGLCustomUtils from './scripts/webgl-custom-utils'
 import WebGLUtils from './scripts/webgl-google-utils'
-import { mat4, vec3 } from './scripts/webgl-matrix'
 import { createProgram, createShader, resizeCanvasToDisplaySize } from './scripts/webgl-utils'
 import { Shader } from './scripts/constants'
 import { IWebGLRenderingContext } from './scripts/types'

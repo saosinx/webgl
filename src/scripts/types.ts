@@ -5,7 +5,7 @@ export interface IWebGLRenderingContext extends WebGLRenderingContext {
 
 export interface IScene {
 	[key: string]: {
-		readonly elem: HTMLElement
+		readonly elem: Element
 		value: number
 	}
 }

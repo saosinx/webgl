@@ -1,14 +1,16 @@
 {
 	"compilerOptions": {
-		"outDir": "./dist/",
+		"target": "ESNext",
+		"module": "ESNext",
+		"lib": ["ESNext", "DOM"],
+		"moduleResolution": "Node",
 		"sourceMap": true,
-		"noImplicitAny": true,
-		"module": "es6",
-		"target": "es5",
-		"jsx": "react",
-		"allowJs": true,
-		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
 		"esModuleInterop": true,
-		"moduleResolution": "node"
-	}
+		"types": ["vite/client"],
+		"noEmit": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true
+	},
+	"include": ["./src"]
 }

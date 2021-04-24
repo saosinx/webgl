@@ -16,6 +16,7 @@ class Model {
 		this.z = z
 		this.n = n
 		this.vertices = []
+		this.colors = [0, 0, 0]
 		this.matrix = mat4.create()
 	}
 }
@@ -27,7 +28,6 @@ export class Sphere extends Model {
 		super(n, x, y, z)
 
 		this.radius = radius
-		this.colors = [0, 0, 0]
 		this.generateSphere()
 	}
 
@@ -92,7 +92,6 @@ export class Torus extends Model {
 		this.innerRadius = innerRadius
 		this.outerRadius = outerRadius
 		this.sector = (2 * Math.PI) / this.n
-		this.colors = [0, 0, 0]
 		this.generateTorus()
 	}
 
@@ -149,7 +148,6 @@ export class Prism extends Model {
 		this.height = height
 		this.radius = radius
 		this.sector = (2 * Math.PI) / this.n
-		this.colors = [0, 0, 0]
 		this.generatePrism()
 	}
 
