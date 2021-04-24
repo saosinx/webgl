@@ -71,14 +71,6 @@ export const createShader = (gl: WebGLRenderingContext, type: Shader) => {
 	}
 }
 
-/**
- * Resize a canvas to match the size its displayed.
- * @param {HTMLCanvasElement} canvas The canvas to resize.
- * @param {number} [multiplier] amount to multiply by.
- *    Pass in window.devicePixelRatio for native pixels.
- * @return {boolean} true if the canvas was resized.
- * @memberOf module:webgl-utils
- */
 export const resizeCanvasToDisplaySize = (canvas: HTMLCanvasElement, multiplier = 1) => {
 	const width = (canvas.clientWidth * multiplier) | 0
 	const height = (canvas.clientHeight * multiplier) | 0
@@ -92,12 +84,6 @@ export const resizeCanvasToDisplaySize = (canvas: HTMLCanvasElement, multiplier 
 	return false
 }
 
-/**
- * Resize a canvas to match the size its displayed.
- * @param {HTMLCanvasElement} canvas The canvas to resize.
- * @return {boolean} true if the canvas was resized.
- * @memberOf module:webgl-utils
- */
 export const resizeCanvasToSquare = (canvas: HTMLCanvasElement) => {
 	const styles = getComputedStyle(canvas)
 	const width = parseFloat(styles.width)

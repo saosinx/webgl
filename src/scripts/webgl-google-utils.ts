@@ -70,8 +70,6 @@ export const getRotationFromMatrix = (matrix: number[]) => ({
 	z: Math.asin(matrix[1]),
 })
 
-export const rad = (degrees: number | string) => (parseFloat(String(degrees)) * Math.PI) / 180
-
 export const getMousePosition = (event: MouseEvent) => ({ x: event.offsetX, y: event.offsetY })
 
 export const getNodeFromMouse = (
@@ -154,14 +152,6 @@ export function addTexture(gl: WebGLRenderingContext, imageURL: string, glTextur
 
 	texture.image.src = imageURL
 	return texture
-}
-
-export function ease(from: number, to: number, easiness: number) {
-	if (easiness > 1) {
-		easiness = 1 / easiness
-	}
-
-	return (to - from) * easiness
 }
 
 export function displayAlertMatrix(matrix: number[]) {

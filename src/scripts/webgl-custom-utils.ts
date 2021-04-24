@@ -1,16 +1,10 @@
-interface IWebGLRenderingContextExtended extends WebGLRenderingContext {
-	program: WebGLProgram
-}
+import { IScene, IWebGLRenderingContext } from './types'
 
-interface IScene {
-	[key: string]: {
-		readonly elem: HTMLElement
-		value: number
-	}
-}
+export const rad = (deg: number) => (deg * Math.PI) / 180
+export const deg = (rad: number) => (rad * 180) / Math.PI
 
 export default class WebGLCustomUtils {
-	public gl: IWebGLRenderingContextExtended
+	public gl: IWebGLRenderingContext
 	public scene: IScene
 	public fpsCounter: HTMLElement
 	public frameCounter: HTMLElement
@@ -19,7 +13,7 @@ export default class WebGLCustomUtils {
 	public frames: number
 	public fps: number
 
-	constructor(gl?: IWebGLRenderingContextExtended) {
+	constructor(gl?: IWebGLRenderingContext) {
 		this.scene = {
 			modelRotateX: {
 				elem: this.$('modelRotateX'),
@@ -78,8 +72,8 @@ export default class WebGLCustomUtils {
 	public setCanvasControls(): void {
 		let isRotatable: boolean = false
 
-		this.gl.canvas.addEventListener('mousedown', (e: MouseEvent) => (isRotatable = true))
-		this.gl.canvas.addEventListener('mouseup', (e: MouseEvent) => (isRotatable = false))
+		this.gl.canvas.addEventListener('mousedown', () => (isRotatable = true))
+		this.gl.canvas.addEventListener('mouseup', () => (isRotatable = false))
 		this.gl.canvas.addEventListener('mousemove', (e: MouseEvent) => {
 			if (!isRotatable) return false
 
