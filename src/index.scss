@@ -1,2 +1,63 @@
-@import './styles/main';
+@import './styles/colors';
 @import './styles/input';
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	height: 100%;
+	width: 100%;
+}
+
+html {
+	font-family: Ubuntu, 'Noto Sans JP Regular', monospace;
+	font-size: 16px;
+}
+
+body {
+	background: $color-black;
+}
+
+canvas {
+	display: block;
+	touch-action: none;
+	outline: 1px solid rgba(white, 0.15);
+	margin: 0 auto;
+	height: 100%;
+	max-width: 100%;
+
+	&:active {
+		cursor: pointer;
+	}
+}
+
+.canvas-info {
+	display: flex;
+	flex-direction: column;
+	font-size: 0.875em;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+
+	&__fps,
+	&__frames,
+	&__time {
+		color: $color-green;
+	}
+
+	&__fps::after {
+		content: ' FPS';
+	}
+	&__time::after {
+		content: ' sec';
+	}
+	&__frames::after {
+		content: ' frames';
+	}
+}

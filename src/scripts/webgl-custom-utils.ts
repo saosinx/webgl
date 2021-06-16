@@ -1,108 +1,85 @@
-import { IScene, IWebGLRenderingContext } from './types'
+import { IWCU } from './types'
 
-export const rad = (deg: number) => (deg * Math.PI) / 180
-export const deg = (rad: number) => (rad * 180) / Math.PI
+export const WCU = (function (root) {
+	const WCU = {
+		_: {
+			stats: {},
+		},
+	} as IWCU
 
-export default class WebGLCustomUtils {
-	public gl: IWebGLRenderingContext
-	public scene: IScene
-	public fpsCounter: Element
-	public frameCounter: Element
-	public timeCounter: Element
-	public lastTime: number
-	public frames: number
-	public fps: number
+	const math = Math,
+		mmax = math.max,
+		mmin = math.min,
+		abs = math.abs,
+		pow = math.pow,
+		PI = math.PI,
+		round = math.round,
+		toFloat = parseFloat,
+		toInt = parseInt
 
-	constructor(gl?: IWebGLRenderingContext) {
-		this.scene = {
-			modelRotateX: {
-				elem: this.$('modelRotateX'),
-				value: 0,
-			},
-			modelRotateY: {
-				elem: this.$('modelRotateY'),
-				value: 0,
-			},
-			modelRotateZ: {
-				elem: this.$('modelRotateZ'),
-				value: 0,
-			},
-			modelTranslateX: {
-				elem: this.$('modelTranslateX'),
-				value: 0,
-			},
-			modelTranslateY: {
-				elem: this.$('modelTranslateY'),
-				value: 0,
-			},
-			modelTranslateZ: {
-				elem: this.$('modelTranslateZ'),
-				value: 0,
-			},
-			cameraX: {
-				elem: this.$('cameraX'),
-				value: 0,
-			},
-			cameraY: {
-				elem: this.$('cameraY'),
-				value: 0,
-			},
-			cameraZ: {
-				elem: this.$('cameraZ'),
-				value: 0,
-			},
-		}
+	WCU._.viewportRatio = 0
+	WCU._.lastTime = 0
+	WCU._.frames = 0
+	WCU._.fps = 0
 
-		this.gl = gl
-
-		this.fpsCounter = this.$('fps-counter')
-		this.frameCounter = this.$('frame-counter')
-		this.timeCounter = this.$('time-counter')
-
-		this.lastTime = 0
-		this.frames = 0
-		this.fps = 0
+	const glob = {
+		win: root.window,
+		doc: root.window.document,
 	}
 
-	public $(selector: string, qs?: boolean) {
-		if (!qs) return document.getElementById(selector)
-		return document.querySelector(selector)
+	WCU._.glob = glob
+
+	function rad(deg: number) {
+		return ((deg % 360) * PI) / 180
+	}
+	function deg(rad: number) {
+		return ((rad * 180) / PI) % 360
+	}
+	function $(selector: string, qs?: boolean) {
+		return !qs ? glob.doc.getElementById(selector) : glob.doc.querySelector(selector)
 	}
 
-	public setCanvasControls(): void {
-		let isRotatable: boolean = false
+	WCU.sin = angle => math.sin(WCU.rad(angle))
+	WCU.tan = angle => math.tan(WCU.rad(angle))
+	WCU.cos = angle => math.cos(WCU.rad(angle))
+	WCU.asin = num => WCU.deg(math.asin(num))
+	WCU.acos = num => WCU.deg(math.acos(num))
+	WCU.atan = num => WCU.deg(math.atan(num))
 
-		this.gl.canvas.addEventListener('mousedown', () => (isRotatable = true))
-		this.gl.canvas.addEventListener('mouseup', () => (isRotatable = false))
-		this.gl.canvas.addEventListener('mousemove', (e: MouseEvent) => {
-			if (!isRotatable) return false
+	WCU.setCanvasStats = () => {
+		const container = glob.doc.createElement('div')
+		container.className = 'canvas-info'
 
-			if (e.shiftKey) {
-				this.scene.modelTranslateX.value += 10 * (e.movementX / this.gl.drawingBufferWidth)
-				this.scene.modelTranslateY.value -= 10 * (e.movementY / this.gl.drawingBufferWidth)
+		const fps = glob.doc.createElement('div')
+		const frame = glob.doc.createElement('div')
+		const time = glob.doc.createElement('div')
 
-				this.updateInfobar(this.scene.modelTranslateX.elem)
-				this.updateInfobar(this.scene.modelTranslateY.elem)
+		time.className = 'canvas-info__time'
+		frame.className = 'canvas-info__frames'
+		fps.className = 'canvas-info__fps'
 
-				return
-			}
+		container.append(time, frame, fps)
 
-			this.scene.modelRotateX.value += e.movementY / 3
-			this.scene.modelRotateY.value += e.movementX / 3
+		glob.doc.body.appendChild(container)
 
-			this.updateInfobar(this.scene.modelRotateX.elem)
-			this.updateInfobar(this.scene.modelRotateY.elem)
-		})
-
-		this.gl.canvas.addEventListener('wheel', (e: WheelEvent) => {
-			let direction: number = e.deltaY < 0 ? -0.05 : 0.05
-			if (e.shiftKey) direction *= 5
-			this.scene.cameraZ.value += direction
-			this.updateInfobar(this.scene.cameraZ.elem)
-		})
+		WCU._.stats.fps = fps
+		WCU._.stats.frame = frame
+		WCU._.stats.time = time
 	}
 
-	protected updateInfobar(elem: Element): void {
-		elem.innerHTML = this.scene[elem.id].value.toFixed(2)
+	WCU.updateCanvasStats = (time = 0) => {
+		WCU._.fps = 1e3 / (time - WCU._.lastTime)
+		WCU._.stats.fps.textContent = WCU._.fps.toFixed(1)
+		WCU._.stats.frame.textContent = String(++WCU._.frames)
+		WCU._.stats.time.textContent = (time / 1e3).toFixed(1)
+		WCU._.lastTime = time
+		WCU._.viewportRatio = WCU.ctx.drawingBufferHeight / WCU.ctx.drawingBufferWidth
 	}
-}
+
+	WCU.rad = rad
+	WCU.deg = deg
+	WCU._.$ = $
+	WCU.ctx = null
+
+	return WCU
+})(window || this)
